@@ -22,9 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-IPXACT_NS = 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'
-ns = {'spirit' : IPXACT_NS}
-
 class IpxactInt(int):
     def __new__(cls, *args, **kwargs):
         if not args:
@@ -37,28 +34,29 @@ class IpxactInt(int):
 class IpxactItem(object):
     MEMBERS = {}
     CHILDREN = []
-    def __init__(self, root=None):
+    def __init__(self, root=None, ns=None):
+        self.ns = ns
         for key, value in self.MEMBERS.items():
             setattr(self, key, value)
         for c in self.CHILDREN:
             setattr(self, c, [])
 
-        if root:
+        if root is not None:
             self.parse_tree(root)
 
     def parse_tree(self, root):
         for _name, _type in self.MEMBERS.items():
-            tmp = root.find('./spirit:{}'.format(_name), ns)
+            tmp = root.find('./spirit:{}'.format(_name), self.ns)
             if tmp is not None:
                 setattr(self, _name, _type(tmp.text))
             else:
                 setattr(self, _name, _type())
 
         for c in self.CHILDREN:
-            for f in root.findall(".//spirit:{}".format(c), ns):
+            for f in root.findall(".//spirit:{}".format(c), self.ns):
                 child = getattr(self, c)
                 class_name = c[0].upper() + c[1:]
-                t = eval(class_name)(f)
+                t = eval(class_name)(f, self.ns)
                 child.append(t)
     
 class Field(IpxactItem):
@@ -92,11 +90,26 @@ class MemoryMaps(IpxactItem):
     CHILDREN = ['addressMap']
 
 class Ipxact:
-    def __init__(self, root):
-        self.memoryMaps = [MemoryMap(m) for m in root.findall('spirit:memoryMap', ns)]
+    nsmap = [('1.4' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
+             ('1.5' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5')]
 
-#        self.memoryMaps = 
+    def __init__(self, root):
         
-#for mmap in mmaps:
-#    memory_map = MemoryMap(mmap)
-    
+        #Warning: Horrible hack to find out which IP-Xact version that is used
+        version = ""
+        for key, value in root.attrib.items():
+            if key == '{http://www.w3.org/2001/XMLSchema-instance}schemaLocation':
+                nstags = value.split()
+                for i in self.nsmap:
+                    if i[2] in nstags:
+                        nsver = i[0]
+                        nskey = i[1]
+                        nsval = i[2]
+        if root.tag == '{'+nsval+'}component':
+            path = "spirit:memoryMaps/spirit:memoryMap"
+        elif root.tag == '{'+nsval+'}memoryMaps':
+            path = "spirit:memoryMap"
+        else:
+            raise Exception
+        ns = {nskey : nsval}
+        self.memoryMaps = [MemoryMap(m, ns) for m in root.findall(path, ns)]
