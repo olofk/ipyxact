@@ -58,6 +58,13 @@ class IpxactItem(object):
                 class_name = c[0].upper() + c[1:]
                 t = eval(class_name)(f, self.ns)
                 child.append(t)
+
+class EnumeratedValue(IpxactItem):
+    MEMBERS = {'name' : str,
+               'value' : IpxactInt}
+
+class EnumeratedValues(IpxactItem):
+    CHILDREN = ['enumeratedValue']
     
 class Field(IpxactItem):
     MEMBERS = {'name'        : str,
@@ -65,11 +72,14 @@ class Field(IpxactItem):
                'bitOffset'   : IpxactInt,
                'bitWidth'    : IpxactInt,
                'access'      : str}
+    CHILDREN = ['enumeratedValues']
 
 class Register(IpxactItem):
     MEMBERS = {'name'          : str,
                'description'   : str,
+               'access'        : str, #FIXME enum
                'addressOffset' : IpxactInt,
+               'size'          : IpxactInt,
                'width'         : IpxactInt}
     CHILDREN = ['field']
 
@@ -77,6 +87,7 @@ class AddressBlock(IpxactItem):
     MEMBERS = {'name'        : str,
                'description' : str,
                'baseAddress' : IpxactInt,
+               'range' : IpxactInt,
                'width' : IpxactInt}
 
     CHILDREN = ['register']
