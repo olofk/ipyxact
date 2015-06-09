@@ -28,6 +28,13 @@ class IpxactInt(int):
             return super(IpxactInt, cls).__new__(cls)
         elif len(args[0]) > 2 and args[0][0:2] == '0x':
             return super(IpxactInt, cls).__new__(cls, args[0][2:], 16)
+        elif "'" in args[0]:
+            sep = args[0].find("'")
+            if args[0][sep+1] == "h":
+                base = 16
+            else:
+                raise Exception
+            return super(IpxactInt, cls).__new__(cls, args[0][sep+2:], base)
         else:
             return super(IpxactInt, cls).__new__(cls, args[0])
 
