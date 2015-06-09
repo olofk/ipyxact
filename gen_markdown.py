@@ -6,17 +6,21 @@ import xml.etree.ElementTree as ET
 
 from ipyxact import MemoryMap, Ipxact
 
-def print_memorymaps(memory_maps):
-    s = """Fancy title
+def print_memorymaps(memory_maps, offset=0, title=None):
+    s = """{}
 ===========
 
 Register Map
 ------------
 """
+    if title:
+        s = s.format(title)
+    else:
+        s = s.format("Register map")
     for m in memory_maps:
         for block in m.addressBlock:
             for reg in sorted(block.register, key=lambda addr: addr.addressOffset):
-                s += "\n##0x{:x} {}\n\n".format(reg.addressOffset, reg.name)
+                s += "\n##0x{:x} {}\n\n".format(offset+reg.addressOffset, reg.name)
                 if reg.description:
                     s += "{}\n\n".format(reg.description)
 
@@ -37,13 +41,18 @@ Register Map
                 else:
                     s += "{}|{}|{}|{}\n".format("{}:{}".format(reg.size-1, 0), reg.access, reg.name, "-")
 
-    print(s)
+    return s
 
+def write_markdown(f, offset, name):
+    tree = ET.parse(f)
+    root = tree.getroot()
+    ipxact = Ipxact(root)
+    return print_memorymaps(ipxact.memoryMaps, offset, name)
 
-f = open(sys.argv[1])
-tree = ET.parse(f)
-root = tree.getroot()
-ipxact = Ipxact(root)
-
-print_memorymaps(ipxact.memoryMaps)
+if __name__ == "__main__":
+    f = open(sys.argv[1])
+    name = None
+    offset = 0
+    print(write_markdown(f, offset, title))
+    f.close()
 
