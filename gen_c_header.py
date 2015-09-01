@@ -14,7 +14,7 @@ def print_c_header(memory_maps, offset=0, name=None):
     s = ""
     for m in memory_maps:
         if name:
-            mname=name
+            mname=name.upper()
         else:
             mname = m.name.upper()
         for block in m.addressBlock:
