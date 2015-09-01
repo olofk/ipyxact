@@ -120,14 +120,32 @@ class MemoryMap(IpxactItem):
 class MemoryMaps(IpxactItem):
     CHILDREN = ['memoryMap']
 
+class File(IpxactItem):
+    MEMBERS = {'name'          : str,
+               'fileType'      : str,
+               'isIncludeFile' : IpxactBool}
+
+class FileSet(IpxactItem):
+    MEMBERS = {'name' : str}
+
+    CHILDREN = ['file']
+
+class FileSets(IpxactItem):
+    CHILDREN = ['fileSet']
+
+class Component(IpxactItem):
+    CHILDREN = ['fileSets', 'memoryMaps']
+
 class Ipxact:
     nsmap = [('1.4' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
              ('1.5' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5')]
 
+    ROOT_TAG = 'component'
     def __init__(self, root):
         
         #Warning: Horrible hack to find out which IP-Xact version that is used
         version = ""
+        nsval = ""
         for key, value in root.attrib.items():
             if key == '{http://www.w3.org/2001/XMLSchema-instance}schemaLocation':
                 nstags = value.split()
@@ -136,11 +154,12 @@ class Ipxact:
                         nsver = i[0]
                         nskey = i[1]
                         nsval = i[2]
-        if root.tag == '{'+nsval+'}component':
-            path = "spirit:memoryMaps/spirit:memoryMap"
-        elif root.tag == '{'+nsval+'}memoryMaps':
-            path = "spirit:memoryMap"
-        else:
+
+        if not (root.tag == '{'+nsval+'}'+self.ROOT_TAG):
             raise Exception
-        ns = {nskey : nsval}
-        self.memoryMaps = [MemoryMap(m, ns) for m in root.findall(path, ns)]
+        self.ns = {nskey : nsval}
+
+        t = Component(root, self.ns)
+        for c in t.CHILDREN:
+            child = getattr(t, c)
+            setattr(self, c, child)

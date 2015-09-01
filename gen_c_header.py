@@ -3,7 +3,7 @@
 import sys
 import xml.etree.ElementTree as ET
 
-from ipyxact import MemoryMap, Ipxact
+from ipyxact import Ipxact
 
 def gen_mask(offset, width):
     mask = 0
@@ -12,7 +12,7 @@ def gen_mask(offset, width):
     return mask
 def print_c_header(memory_maps, offset=0, name=None):
     s = ""
-    for m in memory_maps:
+    for m in memory_maps[0].memoryMap:
         if name:
             mname=name.upper()
         else:
