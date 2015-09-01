@@ -118,7 +118,7 @@ class MemoryMap(IpxactItem):
     CHILDREN = ['addressBlock']
 
 class MemoryMaps(IpxactItem):
-    CHILDREN = ['addressMap']
+    CHILDREN = ['memoryMap']
 
 class Ipxact:
     nsmap = [('1.4' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
