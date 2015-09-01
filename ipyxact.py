@@ -38,6 +38,17 @@ class IpxactInt(int):
         else:
             return super(IpxactInt, cls).__new__(cls, args[0])
 
+class IpxactBool(object):
+    def __new__(cls, *args, **kwargs):
+        if not args:
+            return False
+        elif args[0] == 'true':
+            return True
+        elif args[0] == 'false':
+            return False
+        else:
+            raise Exception
+
 class IpxactItem(object):
     MEMBERS = {}
     CHILDREN = []
@@ -78,6 +89,7 @@ class Field(IpxactItem):
                'description' : str,
                'bitOffset'   : IpxactInt,
                'bitWidth'    : IpxactInt,
+               'volatile'    : IpxactBool,
                'access'      : str}
     CHILDREN = ['enumeratedValues']
 
@@ -87,6 +99,7 @@ class Register(IpxactItem):
                'access'        : str, #FIXME enum
                'addressOffset' : IpxactInt,
                'size'          : IpxactInt,
+               'volatile'      : IpxactBool,
                'width'         : IpxactInt}
     CHILDREN = ['field']
 
