@@ -3,7 +3,7 @@
 import sys
 import xml.etree.ElementTree as ET
 
-from ipyxact import Ipxact
+from ipyxact.ipyxact import Ipxact
 
 def gen_mask(offset, width):
     mask = 0
