@@ -52,12 +52,15 @@ class IpxactBool(object):
 class IpxactItem(object):
     MEMBERS = {}
     CHILDREN = []
+    CHILD = []
     def __init__(self, root=None, ns=None):
         self.ns = ns
         for key, value in self.MEMBERS.items():
             setattr(self, key, value)
         for c in self.CHILDREN:
             setattr(self, c, [])
+        for c in self.CHILD:
+            setattr(self, c, None)
 
         if root is not None:
             self.parse_tree(root)
@@ -76,6 +79,11 @@ class IpxactItem(object):
                 class_name = c[0].upper() + c[1:]
                 t = eval(class_name)(f, self.ns)
                 child.append(t)
+        for c in self.CHILD:
+            f = root.find(".//spirit:{}".format(c), self.ns)
+            class_name = c[0].upper() + c[1:]
+            t = eval(class_name)(f, self.ns)
+            setattr(self, c, t)
 
 class EnumeratedValue(IpxactItem):
     MEMBERS = {'name' : str,
@@ -161,5 +169,8 @@ class Ipxact:
 
         t = Component(root, self.ns)
         for c in t.CHILDREN:
+            child = getattr(t, c)
+            setattr(self, c, child)
+        for c in t.CHILD:
             child = getattr(t, c)
             setattr(self, c, child)
