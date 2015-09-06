@@ -50,11 +50,14 @@ class IpxactBool(object):
             raise Exception
 
 class IpxactItem(object):
+    ATTRIBS = {}
     MEMBERS = {}
     CHILDREN = []
     CHILD = []
     def __init__(self, root=None, ns=None):
         self.ns = ns
+        for key, value in self.ATTRIBS.items():
+            setattr(self, key, value)
         for key, value in self.MEMBERS.items():
             setattr(self, key, value)
         for c in self.CHILDREN:
@@ -66,6 +69,11 @@ class IpxactItem(object):
             self.parse_tree(root)
 
     def parse_tree(self, root):
+        if self.ATTRIBS:
+            for _name, _type in self.ATTRIBS.items():
+                _tagname = '{' + self.ns['spirit'] + '}' + _name
+                if _tagname in root.attrib:
+                    setattr(self, _name, _type(root.attrib[_tagname]))
         for _name, _type in self.MEMBERS.items():
             tmp = root.find('./spirit:{}'.format(_name), self.ns)
             if tmp is not None:
