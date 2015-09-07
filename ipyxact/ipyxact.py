@@ -149,8 +149,46 @@ class FileSet(IpxactItem):
 class FileSets(IpxactItem):
     CHILDREN = ['fileSet']
 
+class Vector(IpxactItem):
+    MEMBERS = {'left'  : IpxactInt,
+               'right' : IpxactInt}
+
+class PhysicalPort(IpxactItem):
+    MEMBERS = {'name' : str}
+
+    CHILD = ['vector']
+
+class LogicalPort(IpxactItem):
+    MEMBERS = {'name' : str}
+
+    CHILD = ['vector']
+
+class PortMap(IpxactItem):
+    CHILD = ['logicalPort', 'physicalPort']
+
+class PortMaps(IpxactItem):
+    CHILDREN = ['portMap']
+
+class BusType(IpxactItem):
+    ATTRIBS = {'vendor'  : str,
+               'library' : str,
+               'name'    : str,
+               'version' : str}
+
+class BusInterface(IpxactItem):
+    MEMBERS = {'name'               : str,
+               'abstractionType'    : str,
+               'mirroredMaster'     : str,
+    }
+
+    CHILD = ['busType', 'portMaps']
+
+class BusInterfaces(IpxactItem):
+    CHILDREN = ['busInterface']
+
 class Component(IpxactItem):
     CHILDREN = ['fileSets', 'memoryMaps']
+    CHILD = ['busInterfaces']
 
 class Ipxact:
     nsmap = [('1.4' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
