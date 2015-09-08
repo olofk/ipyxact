@@ -194,6 +194,11 @@ class BusInterfaces(IpxactItem):
     CHILDREN = ['busInterface']
 
 class Component(IpxactItem):
+    MEMBERS = {'vendor'  : str,
+               'library' : str,
+               'name'    : str,
+               'version' : str,
+               }
     CHILDREN = ['fileSets', 'memoryMaps']
     CHILD = ['busInterfaces']
 
