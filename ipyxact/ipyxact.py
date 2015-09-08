@@ -67,50 +67,54 @@ class IpxactItem(object):
         for c in self.CHILD:
             setattr(self, c, None)
 
-        if root is not None:
-            self.parse_tree(root)
-
-    def parse_tree(self, root):
+    def parse_tree(self, root, ns):
         if self.ATTRIBS:
             for _name, _type in self.ATTRIBS.items():
-                _tagname = '{' + self.ns['spirit'] + '}' + _name
+                _tagname = '{' + ns['spirit'] + '}' + _name
                 if _tagname in root.attrib:
                     setattr(self, _name, _type(root.attrib[_tagname]))
         for _name, _type in self.MEMBERS.items():
-            tmp = root.find('./spirit:{}'.format(_name), self.ns)
+            tmp = root.find('./spirit:{}'.format(_name), ns)
             if tmp is not None and tmp.text is not None:
                 setattr(self, _name, _type(tmp.text))
             else:
                 setattr(self, _name, _type())
 
         for c in self.CHILDREN:
-            for f in root.findall(".//spirit:{}".format(c), self.ns):
+            for f in root.findall(".//spirit:{}".format(c), ns):
                 child = getattr(self, c)
                 class_name = c[0].upper() + c[1:]
-                t = eval(class_name)(f, self.ns)
+                t = eval(class_name)()
+                t.parse_tree(f, ns)
                 child.append(t)
         for c in self.CHILD:
-            f = root.find(".//spirit:{}".format(c), self.ns)
-            class_name = c[0].upper() + c[1:]
-            t = eval(class_name)(f, self.ns)
-            setattr(self, c, t)
+            f = root.find(".//spirit:{}".format(c), ns)
+            if f is not None:
+                class_name = c[0].upper() + c[1:]
+                t = eval(class_name)()
+                t.parse_tree(f, ns)
+                setattr(self, c, t)
 
-    def write(self, root):
-        S = '{%s}' % self.ns['spirit']
+    def write(self, root, ns):
+        S = ns
 
         for a in self.ATTRIBS:
-            root.attrib[a] = getattr(self, a)
+            root.attrib[S+a] = getattr(self, a)
 
         for m in self.MEMBERS:
-            ET.SubElement(root, S+m).text = str(getattr(self, m))
+            tmp = getattr(self, m)
+            if tmp is not None:
+                ET.SubElement(root, S+m).text = str(tmp)
 
         for c in self.CHILDREN:
             for child_obj in getattr(self, c):
                 subel = ET.SubElement(root, S+c)
-                child_obj.write(subel)
+                child_obj.write(subel, S)
         for c in self.CHILD:
             subel = ET.SubElement(root, S+c)
-            getattr(self, c).write(subel)
+            tmp = getattr(self, c)
+            if tmp is not None:
+                tmp.write(subel, S)
 
 class EnumeratedValue(IpxactItem):
     MEMBERS = {'name' : str,
@@ -280,6 +284,7 @@ class Ipxact:
         self.ns = {self.nskey : self.nsval}
 
         self.component = Component(root, self.ns)
+        self.component.parse_tree(root, self.ns)
         for c in self.component.MEMBERS:
             child = getattr(self.component,c)
             setattr(self, c, child)
@@ -294,7 +299,7 @@ class Ipxact:
         ET.register_namespace(self.nskey, self.nsval)
         S = '{%s}' % self.nsval
         root = ET.Element(S+'component')
-        self.component.write(root)
+        self.component.write(root, S)
 
         et = ET.ElementTree(root)
         et.write(f, xml_declaration=True, encoding='unicode')#, default_namespace=SPIRIT_NS)
