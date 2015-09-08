@@ -76,7 +76,7 @@ class IpxactItem(object):
                     setattr(self, _name, _type(root.attrib[_tagname]))
         for _name, _type in self.MEMBERS.items():
             tmp = root.find('./spirit:{}'.format(_name), self.ns)
-            if tmp is not None:
+            if tmp is not None and tmp.text is not None:
                 setattr(self, _name, _type(tmp.text))
             else:
                 setattr(self, _name, _type())
