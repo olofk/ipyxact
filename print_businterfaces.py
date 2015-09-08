@@ -1,5 +1,4 @@
 import sys
-import xml.etree.ElementTree as ET
 
 from ipyxact.ipyxact import Ipxact
 
@@ -33,9 +32,8 @@ def get_businterfaces(busInterfaces):
 if __name__ == "__main__":
     f = open(sys.argv[1])
 
-    tree = ET.parse(f)
-    root = tree.getroot()
-    ipxact = Ipxact(root)
+    ipxact = Ipxact()
+    ipxact.load(f)
 
     print(dir(ipxact))
     #exit(1)

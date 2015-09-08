@@ -1,7 +1,6 @@
 #ipyxact example. Parses an IP-XACT XML file called generic_example.xml
 #and prints out a C header of the register maps found
 import sys
-import xml.etree.ElementTree as ET
 
 from ipyxact.ipyxact import Ipxact
 
@@ -38,9 +37,8 @@ def print_c_header(memory_maps, offset=0, name=None):
     return s
 
 def write_c_header(f, offset, name):
-    tree = ET.parse(f)
-    root = tree.getroot()
-    ipxact = Ipxact(root)
+    ipxact = Ipxact()
+    ipxact.load(f)
     return print_c_header(ipxact.memoryMaps, offset, name)
 
 if __name__ == "__main__":

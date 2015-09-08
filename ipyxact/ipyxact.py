@@ -226,26 +226,24 @@ class Ipxact:
              ('1.5' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5')]
 
     ROOT_TAG = 'component'
-    def __init__(self, root):
+
+    def load(self, f):
+        tree = ET.parse(f)
+        root = tree.getroot()
         
         #Warning: Horrible hack to find out which IP-Xact version that is used
-        version = ""
-        nsval = ""
         for key, value in root.attrib.items():
             if key == '{http://www.w3.org/2001/XMLSchema-instance}schemaLocation':
                 nstags = value.split()
                 for i in self.nsmap:
                     if i[2] in nstags:
-                        nsver = i[0]
-                        nskey = i[1]
-                        nsval = i[2]
+                        self.nsver = i[0]
+                        self.nskey = i[1]
+                        self.nsval = i[2]
 
-        self.nsver = nsver
-        self.nskey = nskey
-        self.nsval = nsval
-        if not (root.tag == '{'+nsval+'}'+self.ROOT_TAG):
+        if not (root.tag == '{'+self.nsval+'}'+self.ROOT_TAG):
             raise Exception
-        self.ns = {nskey : nsval}
+        self.ns = {self.nskey : self.nsval}
 
         self.component = Component(root, self.ns)
         for c in self.component.MEMBERS:
@@ -259,9 +257,7 @@ class Ipxact:
             setattr(self, c, child)
 
     def write(self, f):
-        print(f)
         ET.register_namespace(self.nskey, self.nsval)
-        print(dir(self))
         S = '{%s}' % self.nsval
         root = ET.Element(S+'component')
         self.component.write(root)

@@ -2,9 +2,7 @@
 #and prints out extended Markdown of the register maps found
 import sys
 
-import xml.etree.ElementTree as ET
-
-from ipyxact import MemoryMap, Ipxact
+from ipyxact.ipyxact import Ipxact
 
 def print_memorymaps(memory_maps, offset=0, title=None):
     s = """{}
@@ -44,14 +42,13 @@ Register Map
     return s
 
 def write_markdown(f, offset, name):
-    tree = ET.parse(f)
-    root = tree.getroot()
-    ipxact = Ipxact(root)
+    ipxact = Ipxact()
+    ipxact.load(f)
     return print_memorymaps(ipxact.memoryMaps, offset, name)
 
 if __name__ == "__main__":
     f = open(sys.argv[1])
-    name = None
+    title = None
     offset = 0
     print(write_markdown(f, offset, title))
     f.close()

@@ -1,7 +1,7 @@
 import sys
 import xml.etree.ElementTree as ET
 
-from ipyxact import Ipxact
+from ipyxact.ipyxact import Ipxact
 
 class _File:
     def __init__(self, name, file_type, file_set, is_include_file):
@@ -36,17 +36,15 @@ def print_filesets(file_sets, offset=0, name=None):
     return s
 
 def write_filesets(f):
-    tree = ET.parse(f)
-    root = tree.getroot()
-    ipxact = Ipxact(root)
+    ipxact = Ipxact()
+    ipxact.load(f)
     return print_filesets(ipxact.fileSets)
 
 if __name__ == "__main__":
     f = open(sys.argv[1])
 
-    tree = ET.parse(f)
-    root = tree.getroot()
-    ipxact = Ipxact(root)
+    ipxact = Ipxact()
+    ipxact.load(f)
 
     files = get_files(ipxact.fileSets,
                       file_type_filter=['verilogSource'],
