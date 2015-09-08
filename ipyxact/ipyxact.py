@@ -175,13 +175,20 @@ class BusType(IpxactItem):
                'name'    : str,
                'version' : str}
 
+class AbstractionType(IpxactItem):
+    ATTRIBS = {'vendor'  : str,
+               'library' : str,
+               'name'    : str,
+               'version' : str}
+
 class BusInterface(IpxactItem):
     MEMBERS = {'name'               : str,
-               'abstractionType'    : str,
                'mirroredMaster'     : str,
     }
 
-    CHILD = ['busType', 'portMaps']
+    CHILD = ['abstractionType',
+             'busType',
+             'portMaps']
 
 class BusInterfaces(IpxactItem):
     CHILDREN = ['busInterface']
