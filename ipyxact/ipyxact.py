@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import xml.etree.ElementTree as ET
+
 class IpxactInt(int):
     def __new__(cls, *args, **kwargs):
         if not args:
@@ -92,6 +94,23 @@ class IpxactItem(object):
             class_name = c[0].upper() + c[1:]
             t = eval(class_name)(f, self.ns)
             setattr(self, c, t)
+
+    def write(self, root):
+        S = '{%s}' % self.ns['spirit']
+
+        for a in self.ATTRIBS:
+            root.attrib[a] = getattr(self, a)
+
+        for m in self.MEMBERS:
+            ET.SubElement(root, S+m).text = str(getattr(self, m))
+
+        for c in self.CHILDREN:
+            for child_obj in getattr(self, c):
+                subel = ET.SubElement(root, S+c)
+                child_obj.write(subel)
+        for c in self.CHILD:
+            subel = ET.SubElement(root, S+c)
+            getattr(self, c).write(subel)
 
 class EnumeratedValue(IpxactItem):
     MEMBERS = {'name' : str,
@@ -221,6 +240,9 @@ class Ipxact:
                         nskey = i[1]
                         nsval = i[2]
 
+        self.nsver = nsver
+        self.nskey = nskey
+        self.nsval = nsval
         if not (root.tag == '{'+nsval+'}'+self.ROOT_TAG):
             raise Exception
         self.ns = {nskey : nsval}
@@ -236,3 +258,14 @@ class Ipxact:
             child = getattr(self.component, c)
             setattr(self, c, child)
 
+    def write(self, f):
+        print(f)
+        ET.register_namespace(self.nskey, self.nsval)
+        print(dir(self))
+        S = '{%s}' % self.nsval
+        root = ET.Element(S+'component')
+        self.component.write(root)
+
+        et = ET.ElementTree(root)
+        et.write(f, xml_declaration=True, encoding='unicode')#, default_namespace=SPIRIT_NS)
+        
