@@ -202,12 +202,30 @@ class AbstractionType(IpxactItem):
 
 class BusInterface(IpxactItem):
     MEMBERS = {'name'               : str,
+               'master'             : str,
                'mirroredMaster'     : str,
     }
 
     CHILD = ['abstractionType',
              'busType',
              'portMaps']
+
+    MODELIST = ['master', 'mirroredMaster']
+
+    def parse_tree(self, root, ns):
+        super(BusInterface, self).parse_tree(root, ns)
+        #Set the mode found in the XML
+        for _name in self.MODELIST:
+            tmp = root.find('./spirit:{}'.format(_name), ns)
+            if tmp is not None:
+                self.set_mode(_name)
+
+    def set_mode(self, mode):
+        #Mark all modes as invalid
+        for _name in self.MODELIST:
+            setattr(self, _name, None)
+        #Set the mode
+        setattr(self, mode, "")
 
 class BusInterfaces(IpxactItem):
     CHILDREN = ['busInterface']
