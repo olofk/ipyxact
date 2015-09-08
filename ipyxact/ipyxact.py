@@ -225,10 +225,14 @@ class Ipxact:
             raise Exception
         self.ns = {nskey : nsval}
 
-        t = Component(root, self.ns)
-        for c in t.CHILDREN:
-            child = getattr(t, c)
+        self.component = Component(root, self.ns)
+        for c in self.component.MEMBERS:
+            child = getattr(self.component,c)
             setattr(self, c, child)
-        for c in t.CHILD:
-            child = getattr(t, c)
+        for c in self.component.CHILDREN:
+            child = getattr(self.component, c)
             setattr(self, c, child)
+        for c in self.component.CHILD:
+            child = getattr(self.component, c)
+            setattr(self, c, child)
+
