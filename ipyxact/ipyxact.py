@@ -230,6 +230,20 @@ class BusInterface(IpxactItem):
 class BusInterfaces(IpxactItem):
     CHILDREN = ['busInterface']
 
+class Wire(IpxactItem):
+    MEMBERS = {'direction' : str}
+    CHILD = ['vector']
+
+class Port(IpxactItem):
+    MEMBERS = {'name' : str}
+    CHILD = ['wire']
+               
+class Ports(IpxactItem):
+    CHILDREN = ['port']
+
+class Model(IpxactItem):
+    CHILD = ['ports']
+
 class Component(IpxactItem):
     MEMBERS = {'vendor'  : str,
                'library' : str,
@@ -237,7 +251,9 @@ class Component(IpxactItem):
                'version' : str,
                }
     CHILDREN = ['fileSets', 'memoryMaps']
-    CHILD = ['busInterfaces']
+    CHILD = ['busInterfaces',
+             'model',
+    ]
 
 class Ipxact:
     nsmap = [('1.4' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
