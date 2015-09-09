@@ -265,6 +265,9 @@ class Ipxact:
 
     ROOT_TAG = 'component'
 
+    def __init__(self):
+        self.component = Component()
+        
     def load(self, f):
         tree = ET.parse(f)
         root = tree.getroot()
@@ -283,7 +286,6 @@ class Ipxact:
             raise Exception
         self.ns = {self.nskey : self.nsval}
 
-        self.component = Component(root, self.ns)
         self.component.parse_tree(root, self.ns)
         for c in self.component.MEMBERS:
             child = getattr(self.component,c)
