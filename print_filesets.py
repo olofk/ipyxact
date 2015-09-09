@@ -1,5 +1,4 @@
 import sys
-import xml.etree.ElementTree as ET
 
 from ipyxact.ipyxact import Ipxact
 
