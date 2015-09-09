@@ -111,9 +111,9 @@ class IpxactItem(object):
                 subel = ET.SubElement(root, S+c)
                 child_obj.write(subel, S)
         for c in self.CHILD:
-            subel = ET.SubElement(root, S+c)
             tmp = getattr(self, c)
             if tmp is not None:
+                subel = ET.SubElement(root, S+c)
                 tmp.write(subel, S)
 
 class EnumeratedValue(IpxactItem):
