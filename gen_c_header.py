@@ -39,7 +39,7 @@ def print_c_header(memory_maps, offset=0, name=None):
 def write_c_header(f, offset, name):
     ipxact = Ipxact()
     ipxact.load(f)
-    return print_c_header(ipxact.memoryMaps, offset, name)
+    return print_c_header(ipxact.component.memoryMaps, offset, name)
 
 if __name__ == "__main__":
     f = open(sys.argv[1])

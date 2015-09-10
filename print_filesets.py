@@ -37,7 +37,7 @@ def print_filesets(file_sets, offset=0, name=None):
 def write_filesets(f):
     ipxact = Ipxact()
     ipxact.load(f)
-    return print_filesets(ipxact.fileSets)
+    return print_filesets(ipxact.component.fileSets)
 
 if __name__ == "__main__":
     f = open(sys.argv[1])
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     ipxact = Ipxact()
     ipxact.load(f)
 
-    files = get_files(ipxact.fileSets,
+    files = get_files(ipxact.component.fileSets,
                       file_type_filter=['verilogSource'],
                       include_files=False)
     print(files)

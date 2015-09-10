@@ -56,8 +56,7 @@ class IpxactItem(object):
     MEMBERS = {}
     CHILDREN = []
     CHILD = []
-    def __init__(self, root=None, ns=None):
-        self.ns = ns
+    def __init__(self):
         for key, value in self.ATTRIBS.items():
             setattr(self, key, value)
         for key, value in self.MEMBERS.items():
@@ -70,33 +69,32 @@ class IpxactItem(object):
     def parse_tree(self, root, ns):
         if self.ATTRIBS:
             for _name, _type in self.ATTRIBS.items():
-                _tagname = '{' + ns['spirit'] + '}' + _name
+                _tagname = '{' + ns[1] + '}' + _name
                 if _tagname in root.attrib:
                     setattr(self, _name, _type(root.attrib[_tagname]))
         for _name, _type in self.MEMBERS.items():
-            tmp = root.find('./spirit:{}'.format(_name), ns)
+            tmp = root.find('./{}:{}'.format(ns[0], _name), {ns[0] : ns[1]})
             if tmp is not None and tmp.text is not None:
                 setattr(self, _name, _type(tmp.text))
             else:
                 setattr(self, _name, _type())
 
         for c in self.CHILDREN:
-            for f in root.findall(".//spirit:{}".format(c), ns):
+            for f in root.findall(".//{}:{}".format(ns[0], c), {ns[0] : ns[1]}):
                 child = getattr(self, c)
                 class_name = c[0].upper() + c[1:]
                 t = eval(class_name)()
                 t.parse_tree(f, ns)
                 child.append(t)
         for c in self.CHILD:
-            f = root.find(".//spirit:{}".format(c), ns)
+            f = root.find(".//{}:{}".format(ns[0], c), {ns[0] : ns[1]})
             if f is not None:
                 class_name = c[0].upper() + c[1:]
                 t = eval(class_name)()
                 t.parse_tree(f, ns)
                 setattr(self, c, t)
 
-    def write(self, root, ns):
-        S = ns
+    def write(self, root, S):
 
         for a in self.ATTRIBS:
             root.attrib[S+a] = getattr(self, a)
@@ -220,7 +218,7 @@ class BusInterface(IpxactItem):
         super(BusInterface, self).parse_tree(root, ns)
         #Set the mode found in the XML
         for _name in self.MODELIST:
-            tmp = root.find('./spirit:{}'.format(_name), ns)
+            tmp = root.find('./{}:{}'.format(ns[0], _name), {ns[0] : ns[1]})
             if tmp is not None:
                 self.set_mode(_name)
 
@@ -260,13 +258,14 @@ class Component(IpxactItem):
     ]
 
 class Ipxact:
-    nsmap = [('1.4' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
-             ('1.5' , 'spirit', 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5')]
+    nsmap = {'1.4' : ('spirit' , 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
+             '1.5' : ('spirit' , 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5')}
 
     ROOT_TAG = 'component'
 
     def __init__(self):
         self.component = Component()
+        self.version = '1.5'
         
     def load(self, f):
         tree = ET.parse(f)
@@ -276,33 +275,22 @@ class Ipxact:
         for key, value in root.attrib.items():
             if key == '{http://www.w3.org/2001/XMLSchema-instance}schemaLocation':
                 nstags = value.split()
-                for i in self.nsmap:
-                    if i[2] in nstags:
-                        self.nsver = i[0]
-                        self.nskey = i[1]
-                        self.nsval = i[2]
+                for version, _val in self.nsmap.items():
+                    if _val[1] in nstags:
+                        self.version = version
 
-        if not (root.tag == '{'+self.nsval+'}'+self.ROOT_TAG):
+        S = '{%s}' % self.nsmap[self.version][1]
+        if not (root.tag == S+self.ROOT_TAG):
             raise Exception
-        self.ns = {self.nskey : self.nsval}
 
-        self.component.parse_tree(root, self.ns)
-        for c in self.component.MEMBERS:
-            child = getattr(self.component,c)
-            setattr(self, c, child)
-        for c in self.component.CHILDREN:
-            child = getattr(self.component, c)
-            setattr(self, c, child)
-        for c in self.component.CHILD:
-            child = getattr(self.component, c)
-            setattr(self, c, child)
+        self.component.parse_tree(root, self.nsmap[self.version])
 
     def write(self, f):
-        ET.register_namespace(self.nskey, self.nsval)
-        S = '{%s}' % self.nsval
+        ET.register_namespace(self.nsmap[self.version][0], self.nsmap[self.version][1])
+        S = '{%s}' % self.nsmap[self.version][0]
         root = ET.Element(S+'component')
         self.component.write(root, S)
 
         et = ET.ElementTree(root)
-        et.write(f, xml_declaration=True, encoding='unicode')#, default_namespace=SPIRIT_NS)
+        et.write(f, xml_declaration=True, encoding='unicode')
         

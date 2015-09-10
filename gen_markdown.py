@@ -44,7 +44,7 @@ Register Map
 def write_markdown(f, offset, name):
     ipxact = Ipxact()
     ipxact.load(f)
-    return print_memorymaps(ipxact.memoryMaps, offset, name)
+    return print_memorymaps(ipxact.component.memoryMaps, offset, name)
 
 if __name__ == "__main__":
     f = open(sys.argv[1])

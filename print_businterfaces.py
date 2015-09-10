@@ -35,9 +35,9 @@ if __name__ == "__main__":
     ipxact = Ipxact()
     ipxact.load(f)
 
-    print(dir(ipxact))
-    #exit(1)
-    ifs = get_businterfaces(ipxact.busInterfaces)
-
-    print(ifs)
+    if ipxact.component.busInterfaces is not None:
+        ifs = get_businterfaces(ipxact.component.busInterfaces)
+        print(ifs)
+    else:
+        print("No bus interfaces found in file")
     f.close()
