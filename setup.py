@@ -16,7 +16,7 @@ setup(
     packages = ['ipyxact'],
     long_description = read('README'),
     classifiers = [
-        "Development Status :: Alpha",
+        "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
