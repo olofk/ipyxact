@@ -40,14 +40,12 @@ class IpxactInt(int):
         else:
             return super(IpxactInt, cls).__new__(cls, args[0])
 
-class IpxactBool(object):
+class IpxactBool(str):
     def __new__(cls, *args, **kwargs):
         if not args:
-            return False
-        elif args[0] == 'true':
-            return True
-        elif args[0] == 'false':
-            return False
+            return None
+        elif args[0] in ['true', 'false']:
+            return super(IpxactBool, cls).__new__(cls, args[0])
         else:
             raise Exception
 
