@@ -137,7 +137,7 @@ class Register(IpxactItem):
                'addressOffset' : IpxactInt,
                'size'          : IpxactInt,
                'volatile'      : IpxactBool,
-               'width'         : IpxactInt}
+    }
     CHILDREN = ['field']
 
 class AddressBlock(IpxactItem):
