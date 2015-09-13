@@ -287,7 +287,7 @@ class Ipxact:
 
     def write(self, f):
         ET.register_namespace(self.nsmap[self.version][0], self.nsmap[self.version][1])
-        S = '{%s}' % self.nsmap[self.version][0]
+        S = '{%s}' % self.nsmap[self.version][1]
         root = ET.Element(S+'component')
         self.component.write(root, S)
 

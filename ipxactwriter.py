@@ -96,10 +96,7 @@ WB_SLAVE_PORTS  = [Signal('dat', 32),
 
 
 ipxact = ipyxact.Ipxact()
-ipxact.nsver = '1.5'
-ipxact.nskey = 'spirit'
-ipxact.nsval = 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5'
-ns = {ipxact.nskey : ipxact.nsval}
+ipxact.version = '1.5'
 
 ipxact.component.vendor  = 'opencores'
 ipxact.component.library = 'ip'
