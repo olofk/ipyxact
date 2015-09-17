@@ -11,7 +11,7 @@ def gen_mask(offset, width):
     return mask
 def print_c_header(memory_maps, offset=0, name=None):
     s = ""
-    for m in memory_maps[0].memoryMap:
+    for m in memory_maps.memoryMap:
         if name:
             mname=name.upper()
         else:

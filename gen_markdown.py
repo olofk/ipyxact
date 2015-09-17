@@ -15,7 +15,7 @@ Register Map
         s = s.format(title)
     else:
         s = s.format("Register map")
-    for m in memory_maps[0].memoryMap:
+    for m in memory_maps.memoryMap:
         for block in m.addressBlock:
             for reg in sorted(block.register, key=lambda addr: addr.addressOffset):
                 s += "\n## 0x{:x} {}\n\n".format(offset+reg.addressOffset, reg.name)

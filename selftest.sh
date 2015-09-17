@@ -1,6 +1,6 @@
 echo Running gen_c_header
 python gen_c_header.py generic_example.xml > out.h
-echo Running gen_markdonw
+echo Running gen_markdown
 python gen_markdown.py generic_example.xml > out.md
 echo Running ipxactwriter
 python ipxactwriter.py
