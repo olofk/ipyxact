@@ -9,16 +9,14 @@ class _File:
         self.is_include_file = is_include_file
         self.name            = name
 
-def get_files(fileSets_list, file_type_filter=None, file_set_filter=None, include_files=False):
+def get_files(fileSets, file_type_filter=None, file_set_filter=None, include_files=False):
     files = []
-    for fileSets in fileSets_list:
-        fileSet_list = fileSets.fileSet
-        for fileSet in fileSet_list:
-            if file_set_filter is None or fileSet.name in file_set_filter:
-                for file in fileSet.file:
-                    if file_type_filter is None or file.fileType in file_type_filter:
-                        if file.isIncludeFile == include_files:
-                            files.append(file.name)
+    for fileSet in fileSets.fileSet:
+        if file_set_filter is None or fileSet.name in file_set_filter:
+            for file in fileSet.file:
+                if file_type_filter is None or file.fileType in file_type_filter:
+                    if not include_files or file.isIncludeFile == "true":
+                        files.append(file.name)
     return files
     
 def print_filesets(file_sets, offset=0, name=None):

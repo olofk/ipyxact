@@ -250,8 +250,9 @@ class Component(IpxactItem):
                'name'    : str,
                'version' : str,
                }
-    CHILDREN = ['fileSets']
+
     CHILD = ['busInterfaces',
+             'fileSets',
              'memoryMaps',
              'model',
     ]
