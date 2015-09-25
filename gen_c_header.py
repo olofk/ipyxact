@@ -31,7 +31,7 @@ def print_c_header(memory_maps, offset=0, name=None):
                         if f.enumeratedValues:
                             s += "\ntypedef enum {\n"
                             for es in f.enumeratedValues:
-                                s += "".join(["  {} = {},\n".format(e.name, e.value) for e in sorted(es.enumeratedValue, key=lambda x: x.value)])
+                                s += "".join(["    {}_{} = {},\n".format(f.name.lower(), e.name, e.value<<f.bitOffset) for e in sorted(es.enumeratedValue, key=lambda x: x.value)])
                             s+= "}} {}_t;\n\n".format(f.name.lower())
                 s += "\n"
     return s
