@@ -16,15 +16,21 @@ def print_c_header(memory_maps, offset=0, name=None):
             mname=name.upper()
         else:
             mname = m.name.upper()
+        multiblock = len(m.addressBlock) > 1
+
         for block in m.addressBlock:
+            if multiblock:
+                bname = mname + '_' + block.name.upper()
+            else:
+                bname = mname
             for reg in sorted(block.register, key=lambda addr: addr.addressOffset):
-                s += "#define {}_{} 0x{:08X} \n".format(mname,
+                s += "#define {}_{} 0x{:08X} \n".format(bname,
                                                         reg.name.upper(),
                                                         offset + block.baseAddress + reg.addressOffset)
 
                 if reg.field:
                     for f in sorted(reg.field, key=lambda x: x.bitOffset):
-                        s += "#define {}_{}_{}_MASK 0x{:08X}\n".format(m.name.upper(),
+                        s += "#define {}_{}_{}_MASK 0x{:08X}\n".format(bname,
                                                                        reg.name.upper().replace('-','_'),
                                                                        f.name.upper().replace('-','_'),
                                                                        gen_mask(f.bitOffset, f.bitWidth))
