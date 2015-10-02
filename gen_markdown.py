@@ -18,7 +18,7 @@ Register Map
     for m in memory_maps.memoryMap:
         for block in m.addressBlock:
             for reg in sorted(block.register, key=lambda addr: addr.addressOffset):
-                s += "\n## 0x{:x} {}\n\n".format(offset+reg.addressOffset, reg.name)
+                s += "\n## 0x{:x} {}\n\n".format(offset+block.baseAddress+reg.addressOffset, reg.name)
                 if reg.description:
                     s += "{}\n\n".format(reg.description)
 
