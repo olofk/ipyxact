@@ -54,7 +54,7 @@ class IpxactItem(object):
     MEMBERS = {}
     CHILDREN = []
     CHILD = []
-    def __init__(self):
+    def __init__(self, **kwargs):
         for key, value in self.ATTRIBS.items():
             setattr(self, key, value)
         for key, value in self.MEMBERS.items():
@@ -63,6 +63,15 @@ class IpxactItem(object):
             setattr(self, c, [])
         for c in self.CHILD:
             setattr(self, c, None)
+
+        for k, v in kwargs.items():
+            if k in self.MEMBERS:
+                setattr(self, k, v)
+            elif k in self.ATTRIBS:
+                setattr(self, k, v)
+            else:
+                s = "{} has no member or attribute '{}'"
+                raise AttributeError(s.format(self.__class__.__name__, k))
 
     def parse_tree(self, root, ns):
         if self.ATTRIBS:
