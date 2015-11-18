@@ -1,6 +1,6 @@
 import sys
 
-from ipyxact.ipyxact import Ipxact
+from ipyxact.ipyxact import Component
 
 class _File:
     def __init__(self, name, file_type, file_set, is_include_file):
@@ -33,17 +33,17 @@ def print_filesets(file_sets, offset=0, name=None):
     return s
 
 def write_filesets(f):
-    ipxact = Ipxact()
-    ipxact.load(f)
-    return print_filesets(ipxact.component.fileSets)
+    component = Component()
+    component.load(f)
+    return print_filesets(component.fileSets)
 
 if __name__ == "__main__":
     f = open(sys.argv[1])
 
-    ipxact = Ipxact()
-    ipxact.load(f)
+    component = Component()
+    component.load(f)
 
-    files = get_files(ipxact.component.fileSets,
+    files = get_files(component.fileSets,
                       file_type_filter=['verilogSource'],
                       include_files=False)
     print(files)

@@ -1,6 +1,6 @@
 import sys
 
-from ipyxact.ipyxact import Ipxact
+from ipyxact.ipyxact import Component
 
 def get_businterfaces(busInterfaces):
     ifs = []
@@ -32,11 +32,11 @@ def get_businterfaces(busInterfaces):
 if __name__ == "__main__":
     f = open(sys.argv[1])
 
-    ipxact = Ipxact()
-    ipxact.load(f)
+    component = Component()
+    component.load(f)
 
-    if ipxact.component.busInterfaces is not None:
-        ifs = get_businterfaces(ipxact.component.busInterfaces)
+    if component.busInterfaces is not None:
+        ifs = get_businterfaces(component.busInterfaces)
         print(ifs)
     else:
         print("No bus interfaces found in file")

@@ -22,7 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import yaml
 import xml.etree.ElementTree as ET
+from ipyxact import ipxact_yaml
 
 class IpxactInt(int):
     def __new__(cls, *args, **kwargs):
@@ -50,20 +52,15 @@ class IpxactBool(str):
             raise Exception
 
 class IpxactItem(object):
+    nsmap = {'1.4' : ('spirit' , 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
+             '1.5' : ('spirit' , 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5')}
+    nsversion = '1.5'
+
     ATTRIBS = {}
     MEMBERS = {}
     CHILDREN = []
     CHILD = []
     def __init__(self, **kwargs):
-        for key, value in self.ATTRIBS.items():
-            setattr(self, key, value)
-        for key, value in self.MEMBERS.items():
-            setattr(self, key, value)
-        for c in self.CHILDREN:
-            setattr(self, c, [])
-        for c in self.CHILD:
-            setattr(self, c, None)
-
         for k, v in kwargs.items():
             if k in self.MEMBERS:
                 setattr(self, k, v)
@@ -72,6 +69,24 @@ class IpxactItem(object):
             else:
                 s = "{} has no member or attribute '{}'"
                 raise AttributeError(s.format(self.__class__.__name__, k))
+
+    def load(self, f):
+        tree = ET.parse(f)
+        root = tree.getroot()
+
+        #Warning: Horrible hack to find out which IP-Xact version that is used
+        for key, value in root.attrib.items():
+            if key == '{http://www.w3.org/2001/XMLSchema-instance}schemaLocation':
+                nstags = value.split()
+                for version, _val in self.nsmap.items():
+                    if _val[1] in nstags:
+                        self.nsversion = version
+
+        S = '{%s}' % self.nsmap[self.nsversion][1]
+        if not (root.tag == S+self._tag):
+            raise Exception
+
+        self.parse_tree(root, self.nsmap[self.nsversion])
 
     def parse_tree(self, root, ns):
         if self.ATTRIBS:
@@ -82,27 +97,31 @@ class IpxactItem(object):
         for _name, _type in self.MEMBERS.items():
             tmp = root.find('./{}:{}'.format(ns[0], _name), {ns[0] : ns[1]})
             if tmp is not None and tmp.text is not None:
-                setattr(self, _name, _type(tmp.text))
+                setattr(self, _name, eval(_type)(tmp.text))
             else:
-                setattr(self, _name, _type())
+                setattr(self, _name, eval(_type)())
 
         for c in self.CHILDREN:
             for f in root.findall(".//{}:{}".format(ns[0], c), {ns[0] : ns[1]}):
-                child = getattr(self, c)
+                child = getattr(self, c)[:]
                 class_name = c[0].upper() + c[1:]
-                t = eval(class_name)()
+                t = __import__(self.__module__)
+                t = getattr(t, 'ipyxact')
+                t = getattr(t, class_name)()
+                #t = eval(class_name)()
                 t.parse_tree(f, ns)
                 child.append(t)
+                setattr(self, c, child)
         for c in self.CHILD:
             f = root.find(".//{}:{}".format(ns[0], c), {ns[0] : ns[1]})
             if f is not None:
+                child = getattr(self, c)
                 class_name = c[0].upper() + c[1:]
                 t = eval(class_name)()
                 t.parse_tree(f, ns)
                 setattr(self, c, t)
 
-    def write(self, root, S):
-
+    def _write(self, root, S):
         for a in self.ATTRIBS:
             root.attrib[S+a] = getattr(self, a)
 
@@ -114,192 +133,39 @@ class IpxactItem(object):
         for c in self.CHILDREN:
             for child_obj in getattr(self, c):
                 subel = ET.SubElement(root, S+c)
-                child_obj.write(subel, S)
+                child_obj._write(subel, S)
         for c in self.CHILD:
             tmp = getattr(self, c)
             if tmp is not None:
                 subel = ET.SubElement(root, S+c)
-                tmp.write(subel, S)
-
-class EnumeratedValue(IpxactItem):
-    MEMBERS = {'name' : str,
-               'value' : IpxactInt}
-
-class EnumeratedValues(IpxactItem):
-    CHILDREN = ['enumeratedValue']
-    
-class Field(IpxactItem):
-    MEMBERS = {'name'        : str,
-               'description' : str,
-               'bitOffset'   : IpxactInt,
-               'bitWidth'    : IpxactInt,
-               'volatile'    : IpxactBool,
-               'access'      : str}
-    CHILDREN = ['enumeratedValues']
-
-class Register(IpxactItem):
-    MEMBERS = {'name'          : str,
-               'description'   : str,
-               'access'        : str, #FIXME enum
-               'addressOffset' : IpxactInt,
-               'size'          : IpxactInt,
-               'volatile'      : IpxactBool,
-    }
-    CHILDREN = ['field']
-
-class AddressBlock(IpxactItem):
-    MEMBERS = {'name'        : str,
-               'description' : str,
-               'baseAddress' : IpxactInt,
-               'range' : IpxactInt,
-               'width' : IpxactInt}
-
-    CHILDREN = ['register']
-
-class MemoryMap(IpxactItem):
-    MEMBERS = {'name' : str}
-
-    CHILDREN = ['addressBlock']
-
-class MemoryMaps(IpxactItem):
-    CHILDREN = ['memoryMap']
-
-class File(IpxactItem):
-    MEMBERS = {'name'          : str,
-               'fileType'      : str,
-               'isIncludeFile' : IpxactBool}
-
-class FileSet(IpxactItem):
-    MEMBERS = {'name' : str}
-
-    CHILDREN = ['file']
-
-class FileSets(IpxactItem):
-    CHILDREN = ['fileSet']
-
-class Vector(IpxactItem):
-    MEMBERS = {'left'  : IpxactInt,
-               'right' : IpxactInt}
-
-class PhysicalPort(IpxactItem):
-    MEMBERS = {'name' : str}
-
-    CHILD = ['vector']
-
-class LogicalPort(IpxactItem):
-    MEMBERS = {'name' : str}
-
-    CHILD = ['vector']
-
-class PortMap(IpxactItem):
-    CHILD = ['logicalPort', 'physicalPort']
-
-class PortMaps(IpxactItem):
-    CHILDREN = ['portMap']
-
-class BusType(IpxactItem):
-    ATTRIBS = {'vendor'  : str,
-               'library' : str,
-               'name'    : str,
-               'version' : str}
-
-class AbstractionType(IpxactItem):
-    ATTRIBS = {'vendor'  : str,
-               'library' : str,
-               'name'    : str,
-               'version' : str}
-
-class BusInterface(IpxactItem):
-    MEMBERS = {'name'               : str,
-               'master'             : str,
-               'mirroredMaster'     : str,
-    }
-
-    CHILD = ['abstractionType',
-             'busType',
-             'portMaps']
-
-    MODELIST = ['master', 'mirroredMaster']
-
-    def parse_tree(self, root, ns):
-        super(BusInterface, self).parse_tree(root, ns)
-        #Set the mode found in the XML
-        for _name in self.MODELIST:
-            tmp = root.find('./{}:{}'.format(ns[0], _name), {ns[0] : ns[1]})
-            if tmp is not None:
-                self.set_mode(_name)
-
-    def set_mode(self, mode):
-        #Mark all modes as invalid
-        for _name in self.MODELIST:
-            setattr(self, _name, None)
-        #Set the mode
-        setattr(self, mode, "")
-
-class BusInterfaces(IpxactItem):
-    CHILDREN = ['busInterface']
-
-class Wire(IpxactItem):
-    MEMBERS = {'direction' : str}
-    CHILD = ['vector']
-
-class Port(IpxactItem):
-    MEMBERS = {'name' : str}
-    CHILD = ['wire']
-               
-class Ports(IpxactItem):
-    CHILDREN = ['port']
-
-class Model(IpxactItem):
-    CHILD = ['ports']
-
-class Component(IpxactItem):
-    MEMBERS = {'vendor'  : str,
-               'library' : str,
-               'name'    : str,
-               'version' : str,
-               }
-
-    CHILD = ['busInterfaces',
-             'fileSets',
-             'memoryMaps',
-             'model',
-    ]
-
-class Ipxact:
-    nsmap = {'1.4' : ('spirit' , 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
-             '1.5' : ('spirit' , 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5')}
-
-    ROOT_TAG = 'component'
-
-    def __init__(self):
-        self.component = Component()
-        self.version = '1.5'
-        
-    def load(self, f):
-        tree = ET.parse(f)
-        root = tree.getroot()
-        
-        #Warning: Horrible hack to find out which IP-Xact version that is used
-        for key, value in root.attrib.items():
-            if key == '{http://www.w3.org/2001/XMLSchema-instance}schemaLocation':
-                nstags = value.split()
-                for version, _val in self.nsmap.items():
-                    if _val[1] in nstags:
-                        self.version = version
-
-        S = '{%s}' % self.nsmap[self.version][1]
-        if not (root.tag == S+self.ROOT_TAG):
-            raise Exception
-
-        self.component.parse_tree(root, self.nsmap[self.version])
+                tmp._write(subel, S)
 
     def write(self, f):
-        ET.register_namespace(self.nsmap[self.version][0], self.nsmap[self.version][1])
-        S = '{%s}' % self.nsmap[self.version][1]
-        root = ET.Element(S+'component')
-        self.component.write(root, S)
+        ET.register_namespace(self.nsmap[self.nsversion][0], self.nsmap[self.nsversion][1])
+        S = '{%s}' % self.nsmap[self.nsversion][1]
+        root = ET.Element(S+self._tag)
+        self._write(root, S)
 
         et = ET.ElementTree(root)
         et.write(f, xml_declaration=True, encoding='unicode')
-        
+
+def _generate_classes(j):
+    for tag, _items in j.items():
+        if 'ATTRIBS' in _items:
+            for key, value in _items['ATTRIBS'].items():
+                _items.update({key : eval(value)})
+        if 'MEMBERS' in _items:
+            for key, value in _items['MEMBERS'].items():
+                _items.update({key : None})
+        if 'CHILDREN' in _items:
+            for key in _items['CHILDREN']:
+                _items.update({key : []})
+        if 'CHILD' in _items:
+            for key in _items['CHILD']:
+                _items.update({key : None})
+        _items.update({'_tag' : tag})
+
+        generatedClass = type(tag[0].upper()+tag[1:], (IpxactItem,), _items)
+        globals()[generatedClass.__name__] = generatedClass
+
+_generate_classes(yaml.load(ipxact_yaml.description))

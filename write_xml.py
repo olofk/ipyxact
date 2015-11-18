@@ -1,16 +1,16 @@
 import sys
 
-from ipyxact.ipyxact import Ipxact
+from ipyxact.ipyxact import Component
 
 if __name__ == "__main__":
     f = open(sys.argv[1])
 
-    ipxact = Ipxact()
+    component = Component()
     print("==Loading==")
-    ipxact.load(f)
+    component.load(f)
 
-    ipxact.component.vendor = "testing"
+    component.vendor = "testing"
     f.close()
 
     print("==Writing==")
-    ipxact.write(sys.argv[2])
+    component.write(sys.argv[2])

@@ -2,7 +2,7 @@
 #and prints out a C header of the register maps found
 import sys
 
-from ipyxact.ipyxact import Ipxact
+from ipyxact.ipyxact import Component
 
 def gen_mask(offset, width):
     mask = 0
@@ -43,9 +43,9 @@ def print_c_header(memory_maps, offset=0, name=None):
     return s
 
 def write_c_header(f, offset, name):
-    ipxact = Ipxact()
-    ipxact.load(f)
-    return print_c_header(ipxact.component.memoryMaps, offset, name)
+    component = Component()
+    component.load(f)
+    return print_c_header(component.memoryMaps, offset, name)
 
 if __name__ == "__main__":
     f = open(sys.argv[1])

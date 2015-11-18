@@ -29,7 +29,15 @@ class WBBusInterface(ipyxact.BusInterface):
     def __init__(self, name, mode):
         super(WBBusInterface, self).__init__()
         self.name = name
-        self.set_mode(mode)
+
+        if mode == 'master':
+            self.master = ''
+            self.mdir = 'o'
+            self.sdir = 'i'
+        else:
+            self.slave = ''
+            self.mdir = 'i'
+            self.sdir = 'o'
 
         abstractionType = ipyxact.AbstractionType()
         abstractionType.vendor  = "org.opencores"
@@ -96,15 +104,15 @@ WB_SLAVE_PORTS  = [Signal('dat', 32),
                    Signal('rty')]
 
 
-ipxact = ipyxact.Ipxact()
-ipxact.version = '1.5'
+component = ipyxact.Component()
+component.version = '1.5'
 
-ipxact.component.vendor  = 'opencores'
-ipxact.component.library = 'ip'
-ipxact.component.name    = 'autointercon'
-ipxact.component.version = '0'
+component.vendor  = 'opencores'
+component.library = 'ip'
+component.name    = 'autointercon'
+component.version = '0'
 
-ipxact.component.model = ipyxact.Model()
+component.model = ipyxact.Model()
 
 ports = ipyxact.Ports()
 
@@ -122,11 +130,11 @@ for p in WB_SLAVE_PORTS:
     mp = Port('wbs_ram_{}_o'.format(p.name), 'out', p.width)
     ports.port.append(mp)
 
-ipxact.component.model.ports = ports
+component.model.ports = ports
 
-ipxact.component.busInterfaces = ipyxact.BusInterfaces()
+component.busInterfaces = ipyxact.BusInterfaces()
 busif = WBBusInterface("wb", "mirroredMaster")
 busif.connect("wbs_ram")
 
-ipxact.component.busInterfaces.busInterface.append(busif)
-ipxact.write(sys.argv[1])
+component.busInterfaces.busInterface.append(busif)
+component.write(sys.argv[1])

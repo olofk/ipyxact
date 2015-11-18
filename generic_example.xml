@@ -1198,6 +1198,7 @@
 			</spirit:file>
 		</spirit:fileSet>
 	</spirit:fileSets>
+	<spirit:description>This is the description field of the example component</spirit:description>
 	<spirit:vendorExtensions>
 		<kactus2:extensions>
 			<kactus2:kts_attributes>

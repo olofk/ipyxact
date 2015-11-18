@@ -2,7 +2,7 @@
 #and prints out extended Markdown of the register maps found
 import sys
 
-from ipyxact.ipyxact import Ipxact
+from ipyxact.ipyxact import Component
 
 def print_memorymaps(memory_maps, offset=0, title=None):
     s = """{}
@@ -42,9 +42,9 @@ Register Map
     return s
 
 def write_markdown(f, offset, name):
-    ipxact = Ipxact()
-    ipxact.load(f)
-    return print_memorymaps(ipxact.component.memoryMaps, offset, name)
+    component = Component()
+    component.load(f)
+    return print_memorymaps(component.memoryMaps, offset, name)
 
 if __name__ == "__main__":
     f = open(sys.argv[1])
