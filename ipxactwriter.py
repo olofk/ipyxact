@@ -1,3 +1,4 @@
+import sys
 import ipyxact.ipyxact as ipyxact
 
 class Signal(object):
@@ -128,4 +129,4 @@ busif = WBBusInterface("wb", "mirroredMaster")
 busif.connect("wbs_ram")
 
 ipxact.component.busInterfaces.busInterface.append(busif)
-ipxact.write('wb_intercon.xml')
+ipxact.write(sys.argv[1])

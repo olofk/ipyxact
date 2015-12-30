@@ -13,4 +13,4 @@ if __name__ == "__main__":
     f.close()
 
     print("==Writing==")
-    ipxact.write('new.xml')
+    ipxact.write(sys.argv[2])
