@@ -1,0 +1,1 @@
+['rtl/verilog/example_top.v', 'rtl/verilog/example_core.v', 'bench/example_tb.v']
