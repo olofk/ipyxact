@@ -38,6 +38,9 @@ def write_prologue(of, args):
     for bit in [8, 16, 32, 64]:
         of.write('#define IPYXACT_REG_{}(addr) (*(volatile uint{}_t*)(addr))\n'
                 .format(bit, bit));
+        of.write('#define IPYXACT_RO_REG_{}(addr) '
+                '(*(const volatile uint{}_t*)(addr))\n'
+                .format(bit, bit));
     of.write('\n')
 
 def write_epilogue(of, args):
@@ -70,8 +73,9 @@ def write_memory_maps(of, memory_maps, offset=0, name=None):
                 reg_addr = '0x{:08X}'.format(
                         offset + block.baseAddress + reg.addressOffset)
                 if reg.size in [8, 16, 32, 64]:
-                    of.write('#define {} IPYXACT_REG_{}({})\n'.format(
-                        reg_name, reg.size, reg_addr))
+                    reg_access = 'RO_' if reg.access == 'read-only' else ''
+                    of.write('#define {} IPYXACT_{}REG_{}({})\n'.format(
+                        reg_name, reg_access, reg.size, reg_addr))
                 else:
                     of.write("#define {} {}\n".format(reg_name, reg_addr))
 
