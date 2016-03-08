@@ -54,6 +54,24 @@ def gen_mask(offset, width):
         mask += 1<<i
     return mask
 
+def write_enum(field):
+    of.write("typedef enum {\n")
+    for es in field.enumeratedValues:
+        for e in sorted(es.enumeratedValue, key=lambda x: x.value):
+            of.write("    {}_{} = {},\n".format(
+            field.name.lower(), e.name, e.value<<field.bitOffset))
+    of.write("} {}_t;\n\n".format(field.name.lower()))
+
+def write_reg_fields(reg, reg_name):
+    for f in sorted(reg.field, key=lambda x: x.bitOffset):
+        of.write("#define {}_{}_MASK 0x{:08X}\n".format(
+            reg_name, f.name.upper().replace('-','_'),
+            gen_mask(f.bitOffset, f.bitWidth)))
+        if f.enumeratedValues:
+            of.write('\n')
+            write_enum(field)
+    of.write('\n')
+
 def write_memory_maps(of, memory_maps, offset=0, name=None):
     for m in memory_maps.memoryMap:
         if name:
@@ -67,7 +85,7 @@ def write_memory_maps(of, memory_maps, offset=0, name=None):
                 bname = mname + '_' + block.name.upper()
             else:
                 bname = mname
-            for reg in sorted(block.register, key=lambda addr: addr.addressOffset):
+            for reg in sorted(block.register, key=lambda a: a.addressOffset):
                 reg_name = '{}_{}'.format(
                         bname, reg.name.upper().replace('-', '_'))
                 reg_addr = '0x{:08X}'.format(
@@ -80,16 +98,7 @@ def write_memory_maps(of, memory_maps, offset=0, name=None):
                     of.write("#define {} {}\n".format(reg_name, reg_addr))
 
                 if reg.field:
-                    for f in sorted(reg.field, key=lambda x: x.bitOffset):
-                        of.write("#define {}_{}_MASK 0x{:08X}\n".format(reg_name,
-                                                                       f.name.upper().replace('-','_'),
-                                                                       gen_mask(f.bitOffset, f.bitWidth)))
-                        if f.enumeratedValues:
-                            of.write("\ntypedef enum {\n")
-                            for es in f.enumeratedValues:
-                                of.write("".join(["    {}_{} = {},\n".format(f.name.lower(), e.name, e.value<<f.bitOffset) for e in sorted(es.enumeratedValue, key=lambda x: x.value)]))
-                            of.write("}} {}_t;\n\n".format(f.name.lower()))
-                of.write("\n")
+                    write_reg_fields(reg, reg_name)
 
 if __name__ == '__main__':
     args = parse_args()
