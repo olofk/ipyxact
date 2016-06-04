@@ -102,7 +102,7 @@ class IpxactItem(object):
                 setattr(self, _name, eval(_type)())
 
         for c in self.CHILDREN:
-            for f in root.findall(".//{}:{}".format(ns[0], c), {ns[0] : ns[1]}):
+            for f in root.findall("./{}:{}".format(ns[0], c), {ns[0] : ns[1]}):
                 child = getattr(self, c)[:]
                 class_name = c[0].upper() + c[1:]
                 t = __import__(self.__module__)
@@ -113,7 +113,7 @@ class IpxactItem(object):
                 child.append(t)
                 setattr(self, c, child)
         for c in self.CHILD:
-            f = root.find(".//{}:{}".format(ns[0], c), {ns[0] : ns[1]})
+            f = root.find("./{}:{}".format(ns[0], c), {ns[0] : ns[1]})
             if f is not None:
                 child = getattr(self, c)
                 class_name = c[0].upper() + c[1:]
