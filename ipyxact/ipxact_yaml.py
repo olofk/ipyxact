@@ -15,6 +15,19 @@ addressBlock:
     width: IpxactInt
   CHILDREN:
     - register
+alternateRegister:
+  MEMBERS:
+    name: str
+    description: str
+    access: str
+    addressOffset: IpxactInt
+    size: IpxactInt
+    volatile: IpxactBool
+  CHILDREN:
+    - field
+alternateRegisters:
+  CHILDREN:
+    - alternateRegister
 busInterface:
   MEMBERS:
     name:           str
@@ -59,6 +72,8 @@ field:
     description: str
     bitOffset: IpxactInt
     bitWidth: IpxactInt
+    modifiedWriteValue: str
+    testable: str
     volatile: IpxactBool
     access: str
   CHILDREN:
@@ -122,6 +137,8 @@ register:
     volatile: IpxactBool
   CHILDREN:
     - field
+  CHILD:
+    - alternateRegisters
 vector:
   MEMBERS:
     left:  IpxactInt
