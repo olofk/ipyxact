@@ -21,12 +21,21 @@ def get_businterfaces(busInterfaces):
                                                      _name,
                                                      _version))
         for portMap in busInterface.portMaps.portMap:
-            print("{}[{}:{}] => {}[{}:{}]".format(portMap.logicalPort.name,
-                                           portMap.logicalPort.vector.left,
-                                           portMap.logicalPort.vector.right,
-                                           portMap.physicalPort.name,
-                                           portMap.physicalPort.vector.left,
-                                           portMap.physicalPort.vector.right))
+            if portMap.logicalPort.vector:
+                log_range = '[{}:{}]'.format(portMap.logicalPort.vector.left,
+                                             portMap.logicalPort.vector.right)
+            else:
+                log_range = ''
+            if portMap.physicalPort.vector:
+                phy_range = '[{}:{}]'.format(portMap.physicalPort.vector.left,
+                                             portMap.physicalPort.vector.right)
+            else:
+                phy_range = ''
+
+            print("{}{} => {}{}".format(portMap.logicalPort.name,
+                                        log_range,
+                                        portMap.physicalPort.name,
+                                        phy_range))
     return ifs
     
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ PYTHONPATH=ipyxact python gen_markdown.py generic_example.xml > out/out.md
 echo Running ipxactwriter
 PYTHONPATH=ipyxact python ipxactwriter.py out/ipxactwriter.xml && xmllint --format out/ipxactwriter.xml > out/ipxactwriter2.xml
 echo Running print_businterfaces
-PYTHONPATH=ipyxact python print_businterfaces.py generic_example.xml > out/bus.txt
+PYTHONPATH=ipyxact python print_businterfaces.py businterfaces.xml > out/bus.txt
 echo Running print_filesets
 PYTHONPATH=ipyxact python print_filesets.py generic_example.xml > out/files.txt
 echo Running write_xml

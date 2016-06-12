@@ -1,7 +1,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2015 Olof Kindgren <olof.kindgren@gmail.com>
+Copyright (c) 2015-2016 Olof Kindgren <olof.kindgren@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -93,7 +93,7 @@ class IpxactItem(object):
             for _name, _type in self.ATTRIBS.items():
                 _tagname = '{' + ns[1] + '}' + _name
                 if _tagname in root.attrib:
-                    setattr(self, _name, _type(root.attrib[_tagname]))
+                    setattr(self, _name, eval(_type)(root.attrib[_tagname]))
         for _name, _type in self.MEMBERS.items():
             tmp = root.find('./{}:{}'.format(ns[0], _name), {ns[0] : ns[1]})
             if tmp is not None and tmp.text is not None:
