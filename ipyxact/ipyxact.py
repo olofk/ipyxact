@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 import yaml
 import xml.etree.ElementTree as ET
-from ipyxact import ipxact_yaml
+import ipxact_yaml
 
 class IpxactInt(int):
     def __new__(cls, *args, **kwargs):
