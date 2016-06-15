@@ -24,7 +24,14 @@ THE SOFTWARE.
 
 import yaml
 import xml.etree.ElementTree as ET
-from ipyxact import ipxact_yaml
+
+import sys
+if sys.version_info[0] > 2:
+    UNICODE = 'unicode'
+    from ipyxact import ipxact_yaml
+else:
+    import ipxact_yaml
+    UNICODE = 'utf-8'
 
 class IpxactInt(int):
     def __new__(cls, *args, **kwargs):
@@ -147,7 +154,7 @@ class IpxactItem(object):
         self._write(root, S)
 
         et = ET.ElementTree(root)
-        et.write(f, xml_declaration=True, encoding='unicode')
+        et.write(f, xml_declaration=True, encoding=UNICODE)
 
 def _generate_classes(j):
     for tag, _items in j.items():
