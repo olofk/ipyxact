@@ -11,3 +11,4 @@ Also distributed with the source are some example applications to show how ipyxa
 
 `python print_filesets.py *xml_file*` creates a list of the verilog files found in the fileSets section of *xml_file*
 
+ipyxact is compatible with Python >= 2.7

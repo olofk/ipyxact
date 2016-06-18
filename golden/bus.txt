@@ -1,1 +1,18 @@
-No bus interfaces found in file
+====================
+name    : wb
+wishbone
+busType         : org.opencores/wishbone/wishbone/b3
+abstractionType : org.opencores/wishbone/wishbone/b3
+adr_o[31:0] => wbs_ram_adr_i[31:0]
+dat_o[31:0] => wbs_ram_dat_i[31:0]
+sel_o[3:0] => wbs_ram_sel_i[3:0]
+we_o => wbs_ram_we_i
+cyc_o => wbs_ram_cyc_i
+stb_o => wbs_ram_stb_i
+cti_o[2:0] => wbs_ram_cti_i[2:0]
+bte_o[1:0] => wbs_ram_bte_i[1:0]
+dat_i[31:0] => wbs_ram_dat_o[31:0]
+ack_i => wbs_ram_ack_o
+err_i => wbs_ram_err_o
+rty_i => wbs_ram_rty_o
+[]
