@@ -49,7 +49,7 @@ busType:
     version: str
 component:
   MEMBERS:
-#    description: str
+    description: str
     vendor:  str
     library: str
     name:    str
@@ -83,6 +83,7 @@ file:
     name: str
     fileType: str
     isIncludeFile: IpxactBool
+    logicalName: str
 fileSet:
   MEMBERS:
     name: str
