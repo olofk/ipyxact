@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "ipyxact",
-    version = "0.2.2",
+    version = "0.2.3",
     author = "Olof Kindgren",
     author_email = "olof.kindgren@gmail.com",
     description = "Python IP-Xact handling library",
@@ -24,5 +24,8 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
-    ]
+    ],
+    install_requires=[
+        'pyyaml',
+    ],
 )
