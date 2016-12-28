@@ -45,7 +45,10 @@ def print_c_header(memory_maps, offset=0, name=None):
 def write_c_header(f, offset, name):
     component = Component()
     component.load(f)
-    return print_c_header(component.memoryMaps, offset, name)
+    if component.memoryMaps:
+        return print_c_header(component.memoryMaps, offset, name)
+    else:
+        return "No memory maps found"
 
 if __name__ == "__main__":
     f = open(sys.argv[1])
