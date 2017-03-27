@@ -66,6 +66,12 @@ enumeratedValue:
 enumeratedValues:
   CHILDREN:
     - enumeratedValue
+reset:
+  MEMBERS:
+    value: IpxactInt
+resets:
+  CHILD:
+    - reset
 field:
   MEMBERS:
     name: str
@@ -73,9 +79,12 @@ field:
     bitOffset: IpxactInt
     bitWidth: IpxactInt
     modifiedWriteValue: str
+    readAction: str
     testable: str
     volatile: IpxactBool
     access: str
+  CHILD:
+    - resets
   CHILDREN:
     - enumeratedValues
 file:
