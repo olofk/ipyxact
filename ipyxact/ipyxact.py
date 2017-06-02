@@ -25,12 +25,11 @@ THE SOFTWARE.
 import yaml
 import xml.etree.ElementTree as ET
 
+from . import ipxact_yaml
 import sys
 if sys.version_info[0] > 2:
     UNICODE = 'unicode'
-    from ipyxact import ipxact_yaml
 else:
-    import ipxact_yaml
     UNICODE = 'utf-8'
 
 class IpxactInt(int):
