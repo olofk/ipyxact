@@ -36,17 +36,30 @@ class IpxactInt(int):
     def __new__(cls, *args, **kwargs):
         if not args:
             return super(IpxactInt, cls).__new__(cls)
-        elif len(args[0]) > 2 and args[0][0:2] == '0x':
-            return super(IpxactInt, cls).__new__(cls, args[0][2:], 16)
-        elif "'" in args[0]:
-            sep = args[0].find("'")
-            if args[0][sep+1] == "h":
+
+        expr = args[0]
+        base = 10
+
+        if len(expr) > 2 and expr[0:2] == '0x':
+            # handle non-standard SystemVerilog (but commonly-used) syntax
+            expr = expr[2:]
+            base = 16
+        elif "'" in expr:
+            sep = expr.find("'")
+            # ignore any bit size specified before ' because size is handled by other IP-XACT properties
+            if expr[sep+1] in ["h", "H"]:
                 base = 16
+            elif expr[sep+1] in ["d", "D"]:
+                base = 10
+            elif expr[sep+1] in ["o", "O"]:
+                base = 8
+            elif expr[sep+1] in ["b", "B"]:
+                base = 2
             else:
-                raise Exception
-            return super(IpxactInt, cls).__new__(cls, args[0][sep+2:], base)
-        else:
-            return super(IpxactInt, cls).__new__(cls, args[0])
+                raise ValueError("Could not convert expression to an integer: {}".format(args[0]))
+            expr = expr[sep+2:]
+
+        return super(IpxactInt, cls).__new__(cls, expr, base)
 
 class IpxactBool(str):
     def __new__(cls, *args, **kwargs):
