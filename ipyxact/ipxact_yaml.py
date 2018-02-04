@@ -9,6 +9,7 @@ abstractionType:
 addressBlock:
   MEMBERS:
     name: str
+    displayName: str
     description: str
     baseAddress: IpxactInt
     range: IpxactInt
