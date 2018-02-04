@@ -109,6 +109,8 @@ logicalPort:
 memoryMap:
   MEMBERS:
     name: str
+    displayName: str
+    description: str
   CHILDREN:
     - addressBlock
 memoryMaps:
