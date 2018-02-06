@@ -63,6 +63,7 @@ component:
 enumeratedValue:
   MEMBERS:
     name: str
+    description: str
     value: IpxactInt
 enumeratedValues:
   CHILDREN:
