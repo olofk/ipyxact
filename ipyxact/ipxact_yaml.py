@@ -14,6 +14,7 @@ addressBlock:
     baseAddress: IpxactInt
     range: IpxactInt
     width: IpxactInt
+    usage: str
   CHILDREN:
     - register
 alternateRegister:
