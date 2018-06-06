@@ -9,10 +9,12 @@ abstractionType:
 addressBlock:
   MEMBERS:
     name: str
+    displayName: str
     description: str
     baseAddress: IpxactInt
     range: IpxactInt
     width: IpxactInt
+    usage: str
   CHILDREN:
     - register
 alternateRegister:
@@ -62,6 +64,7 @@ component:
 enumeratedValue:
   MEMBERS:
     name: str
+    description: str
     value: IpxactInt
 enumeratedValues:
   CHILDREN:
@@ -109,6 +112,8 @@ logicalPort:
 memoryMap:
   MEMBERS:
     name: str
+    displayName: str
+    description: str
   CHILDREN:
     - addressBlock
 memoryMaps:
