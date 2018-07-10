@@ -154,6 +154,7 @@ register:
     - field
   CHILD:
     - alternateRegisters
+    - reset
 vector:
   MEMBERS:
     left:  IpxactInt
