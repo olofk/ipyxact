@@ -35,7 +35,7 @@ else:
 class IpxactInt(int):
     def __new__(cls, *args, **kwargs):
         if not args:
-            return super(IpxactInt, cls).__new__(cls)
+            return int()
 
         expr = args[0]
         base = 10
@@ -59,7 +59,7 @@ class IpxactInt(int):
                 raise ValueError("Could not convert expression to an integer: {}".format(args[0]))
             expr = expr[sep+2:]
 
-        return super(IpxactInt, cls).__new__(cls, expr.replace('_', ''), base)
+        return int(expr.replace('_', ''), base)
 
 class IpxactBool(str):
     def __new__(cls, *args, **kwargs):
