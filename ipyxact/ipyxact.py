@@ -37,7 +37,7 @@ class IpxactInt(int):
         if not args:
             return int()
 
-        expr = args[0]
+        expr = args[0].strip()
         base = 10
 
         if len(expr) > 2 and expr[0:2] == '0x':
