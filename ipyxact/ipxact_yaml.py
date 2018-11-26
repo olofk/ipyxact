@@ -14,6 +14,7 @@ addressBlock:
     baseAddress: IpxactInt
     range: IpxactInt
     width: IpxactInt
+    access: str
     usage: str
   CHILDREN:
     - register
@@ -61,6 +62,7 @@ component:
     - fileSets
     - memoryMaps
     - model
+    - parameters
 enumeratedValue:
   MEMBERS:
     name: str
@@ -122,6 +124,16 @@ memoryMaps:
 model:
   CHILD:
     - ports
+parameters:
+  CHILDREN:
+    - parameter
+parameter:
+  ATTRIBS:
+    parameterId: str
+  MEMBERS:
+    name: str
+    value: IpxactInt
+    displayName: str
 physicalPort:
   MEMBERS:
     name: str
@@ -150,6 +162,7 @@ register:
     addressOffset: IpxactInt
     size: IpxactInt
     volatile: IpxactBool
+    isPresent: str
   CHILDREN:
     - field
   CHILD:

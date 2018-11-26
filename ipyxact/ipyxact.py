@@ -113,6 +113,10 @@ class IpxactItem(object):
                 _tagname = '{' + ns[1] + '}' + _name
                 if _tagname in root.attrib:
                     setattr(self, _name, eval(_type)(root.attrib[_tagname]))
+
+                if _name in root.attrib:
+                    setattr(self, _name, eval(_type)(root.attrib[_name]))
+
         for _name, _type in self.MEMBERS.items():
             tmp = root.find('./{}:{}'.format(ns[0], _name), {ns[0] : ns[1]})
             if tmp is not None and tmp.text is not None:
