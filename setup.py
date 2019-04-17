@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "ipyxact",
-    version = "0.2.3",
+    version = "0.2.4",
     author = "Olof Kindgren",
     author_email = "olof.kindgren@gmail.com",
     description = "Python IP-Xact handling library",
