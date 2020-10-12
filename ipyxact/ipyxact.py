@@ -27,6 +27,8 @@ import xml.etree.ElementTree as ET
 
 from . import ipxact_yaml
 import sys
+import re
+
 if sys.version_info[0] > 2:
     UNICODE = 'unicode'
 else:
@@ -58,17 +60,39 @@ class IpxactInt(int):
             else:
                 raise ValueError("Could not convert expression to an integer: {}".format(args[0]))
             expr = expr[sep+2:]
+        elif any(x in expr for x in ("B", "K")):
+            expr = cls.convert_bytes(expr)
 
         return int(expr.replace('_', ''), base)
+
+    @staticmethod
+    def convert_bytes(expr):
+        """ Resolve values of K/B (bytes) in string (4K -> 4096, 4B -> 4) """
+        expr_num = int(re.findall(r'\d+', expr)[0])
+        if "K" in expr:
+            expr_num *= 1024
+        return str(expr_num)
 
 class IpxactBool(str):
     def __new__(cls, *args, **kwargs):
         if not args:
             return None
-        elif args[0] in ['true', 'false']:
-            return super(IpxactBool, cls).__new__(cls, args[0])
+        expr = args[0].strip(' \t\n\r')
+        elif expr in ['true', 'false']:
+            return super(IpxactBool, cls).__new__(cls, expr)
         else:
             raise Exception
+
+class IpxactFloat(float):
+    def __new__(cls, *args, **kwargs):
+        if not args:
+            return float()
+
+        expr = args[0].strip()
+        try:
+            return float(expr)
+        except ValueError:
+            raise ValueError("Could not convert expression to a float: {}".format(args[0]))
 
 class IpxactItem(object):
     nsmap = {'1.4'  : ('spirit' , 'http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.4'),
@@ -82,6 +106,7 @@ class IpxactItem(object):
     MEMBERS = {}
     CHILDREN = []
     CHILD = []
+
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             if k in self.MEMBERS:
@@ -135,6 +160,7 @@ class IpxactItem(object):
                 t.parse_tree(f, ns)
                 child.append(t)
                 setattr(self, c, child)
+
         for c in self.CHILD:
             f = root.find("./{}:{}".format(ns[0], c), {ns[0] : ns[1]})
             if f is not None:

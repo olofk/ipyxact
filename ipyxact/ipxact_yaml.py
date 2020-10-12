@@ -18,6 +18,11 @@ addressBlock:
     usage: str
   CHILDREN:
     - register
+    - registerFile
+access:
+  MEMBERS:
+    portAccessType: str
+    accessHandles: str
 alternateRegister:
   MEMBERS:
     name: str
@@ -63,11 +68,37 @@ component:
     - memoryMaps
     - model
     - parameters
+componentInstantiation:
+  MEMBERS:
+    name: str
+    moduleName: str
+constraintSet:
+  ATTRIBS:
+    constraintSetId: str
+  MEMBERS:
+    timingConstraint: IpxactFloat
+  CHILD:
+    - vector
+    - driveConstraint
+    - loadConstraint
+    - timingConstraint
+constraintSets:
+  CHILDREN:
+    - constraintSet
+driver:
+  MEMBERS:
+    defaultValue: str
+    clockDriver: str
+    singleShotDriver: str
+drivers:
+  CHILDREN:
+    - driver
 enumeratedValue:
   MEMBERS:
     name: str
     description: str
-    value: IpxactInt
+    displayName: str
+    value: str
 enumeratedValues:
   CHILDREN:
     - enumeratedValue
@@ -90,7 +121,6 @@ field:
     access: str
   CHILD:
     - resets
-  CHILDREN:
     - enumeratedValues
 file:
   MEMBERS:
@@ -106,6 +136,9 @@ fileSet:
 fileSets:
   CHILDREN:
     - fileSet
+instantiations:
+  CHILDREN:
+    - componentInstantiation
 logicalPort:
   MEMBERS:
     name: str
@@ -116,6 +149,7 @@ memoryMap:
     name: str
     displayName: str
     description: str
+    addressUnitBits: IpxactInt
   CHILDREN:
     - addressBlock
 memoryMaps:
@@ -123,7 +157,9 @@ memoryMaps:
     - memoryMap
 model:
   CHILD:
+    - views
     - ports
+    - instantiations
 parameters:
   CHILDREN:
     - parameter
@@ -132,7 +168,7 @@ parameter:
     parameterId: str
   MEMBERS:
     name: str
-    value: IpxactInt
+    value: str
     displayName: str
 physicalPort:
   MEMBERS:
@@ -142,8 +178,10 @@ physicalPort:
 port:
   MEMBERS:
     name: str
+    description: str
   CHILD:
     - wire
+    - access
 ports:
   CHILDREN:
     - port
@@ -168,13 +206,41 @@ register:
   CHILD:
     - alternateRegisters
     - reset
+registerFile:
+  MEMBERS:
+    name: str
+    description: str
+    dim: IpxactInt
+    addressOffset: IpxactInt
+    range: IpxactInt
+  CHILDREN:
+    - register
+timingConstraint:
+  ATTRIBS:
+    clockEdge: str
+    clockName: str
+    delayType: str
+vectors:
+  CHILDREN:
+    - vector
 vector:
   MEMBERS:
     left:  IpxactInt
     right: IpxactInt
+view:
+  MEMBERS:
+    name: str
+    envIdentifier: str
+    componentInstantiationRef: str
+views:
+  CHILDREN:
+    - view
 wire:
   MEMBERS:
     direction: str
+    allLogicalDirectionsAllowed: IpxactBool
   CHILD:
-    - vector
+    - constraintSets
+    - vectors
+    - drivers
 """
