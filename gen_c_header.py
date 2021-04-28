@@ -60,7 +60,7 @@ def write_enum(field):
         for e in sorted(es.enumeratedValue, key=lambda x: x.value):
             of.write("    {}_{} = {},\n".format(
             field.name.lower(), e.name, e.value<<field.bitOffset))
-    of.write("} {}_t;\n\n".format(field.name.lower()))
+    of.write("}} {}_t;\n\n".format(field.name.lower()))
 
 def write_reg_fields(reg, reg_name):
     for f in sorted(reg.field, key=lambda x: x.bitOffset):
@@ -69,7 +69,7 @@ def write_reg_fields(reg, reg_name):
             gen_mask(f.bitOffset, f.bitWidth)))
         if f.enumeratedValues:
             of.write('\n')
-            write_enum(field)
+            write_enum(f)
     of.write('\n')
 
 def write_memory_maps(of, memory_maps, offset=0, name=None):
