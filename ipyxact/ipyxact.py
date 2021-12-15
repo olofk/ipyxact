@@ -78,7 +78,7 @@ class IpxactBool(str):
         if not args:
             return None
         expr = args[0].strip(' \t\n\r')
-        elif expr in ['true', 'false']:
+        if expr in ['true', 'false']:
             return super(IpxactBool, cls).__new__(cls, expr)
         else:
             raise Exception
