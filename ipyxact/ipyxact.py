@@ -78,7 +78,7 @@ class IpxactBool(str):
         if not args:
             return None
         expr = args[0].strip(' \t\n\r')
-        elif expr in ['true', 'false']:
+        if expr in ['true', 'false']:
             return super(IpxactBool, cls).__new__(cls, expr)
         else:
             raise Exception
@@ -153,10 +153,7 @@ class IpxactItem(object):
             for f in root.findall("./{}:{}".format(ns[0], c), {ns[0] : ns[1]}):
                 child = getattr(self, c)[:]
                 class_name = c[0].upper() + c[1:]
-                t = __import__(self.__module__)
-                t = getattr(t, 'ipyxact')
-                t = getattr(t, class_name)()
-                #t = eval(class_name)()
+                t = globals()[class_name]()
                 t.parse_tree(f, ns)
                 child.append(t)
                 setattr(self, c, child)
