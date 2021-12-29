@@ -196,6 +196,7 @@ register:
   MEMBERS:
     name: str
     description: str
+    dim: IpxactInt
     access: str
     addressOffset: IpxactInt
     size: IpxactInt
