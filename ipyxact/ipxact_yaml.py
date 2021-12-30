@@ -105,6 +105,7 @@ enumeratedValues:
 reset:
   MEMBERS:
     value: IpxactInt
+    mask: IpxactInt
 resets:
   CHILD:
     - reset
