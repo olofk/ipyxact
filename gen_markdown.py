@@ -10,15 +10,24 @@ def print_memorymaps(memory_maps, offset=0, title=None):
 
 Register Map
 ------------
+
 """
     if title:
         s = s.format(title)
     else:
         s = s.format("Register map")
     for m in memory_maps.memoryMap:
+        if m.name:
+            s += "# {}\n".format(m.name)
+        if m.description:
+            s += "{}\n".format(m.description)
         for block in m.addressBlock:
+            if block.name:
+                s += "## {}\n".format(block.name)
+            if block.description:
+                s += "{}\n".format(block.description)
             for reg in sorted(block.register, key=lambda addr: addr.addressOffset):
-                s += "\n## 0x{:x} {}\n\n".format(offset+block.baseAddress+reg.addressOffset, reg.name)
+                s += "\n### 0x{:x} {}\n\n".format(offset+block.baseAddress+reg.addressOffset, reg.name)
                 if reg.description:
                     s += "{}\n\n".format(reg.description)
 
