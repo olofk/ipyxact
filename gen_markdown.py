@@ -27,6 +27,7 @@ Register Map
             if block.description:
                 s += "{}\n".format(block.description)
             for reg in sorted(block.register, key=lambda addr: addr.addressOffset):
+                s += '\n---\n'
                 s += "\n### 0x{:x} {}\n\n".format(offset+block.baseAddress+reg.addressOffset, reg.name)
                 if reg.description:
                     s += "{}\n\n".format(reg.description)
@@ -37,8 +38,8 @@ Register Map
                     for f in sorted(reg.field, key=lambda x: x.bitOffset):
                         description = f.description
                         if f.enumeratedValues:
-                            for es in f.enumeratedValues:
-                                description += "".join(["<br>{} = {}".format(e.value, e.name) for e in es.enumeratedValue])
+                            description += "".join(["<br>{} = {}".format(
+                                e.value, e.name) for e in f.enumeratedValues.enumeratedValue])
 
                         if f.bitWidth == 1:
                             bits = f.bitOffset
