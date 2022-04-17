@@ -38,7 +38,7 @@ Register Map
                     for f in sorted(reg.field, key=lambda x: x.bitOffset):
                         description = f.description
                         if f.enumeratedValues:
-                            description += "".join(["<br>{} = {}".format(
+                            description += "".join(["<br/>{} = {}".format(
                                 e.value, e.name) for e in f.enumeratedValues.enumeratedValue])
 
                         if f.bitWidth == 1:
