@@ -1,11 +1,12 @@
 # Copyright 2014-2022 Olof Kindgren <olof.kindgren@gmail.com>
 # SPDX-License-Identifier: Apache-2.0
 class Signal(object):
-    def __init__(self, name, width=0, low=0, asc=False, vec=0):
+    def __init__(self, name, width=0, low=0, asc=False, _type=None):
         self.name = name
         self.width=width
         self.low = low
         self.asc = asc
+        self._type = _type
 
     def range(self):
         if self.width > 0:
@@ -19,7 +20,9 @@ class Signal(object):
 
 class Wire(Signal):
     def write(self, width):
-        return 'wire{range} {name};\n'.format(range=self.range().rjust(width), name=self.name)
+        return '{_type}{range} {name};\n'.format(_type=self._type or "wire",
+                                              range=self.range().rjust(width),
+                                              name=self.name)
 
 class Parameter:
     def __init__(self, name, value):
@@ -27,18 +30,22 @@ class Parameter:
         self.value = value
 
 class Port:
-    def __init__(self, name="", value=""):
+    def __init__(self, name="", value="", _type=None):
         self.name = name
         self.value = value
-        self.wires = []
+        self._type = _type
 
 class ModulePort(Signal):
-    def __init__(self, name, dir, width=0, low=0, asc=False):
-        super(ModulePort, self).__init__(name, width, low, asc)
+    def __init__(self, name, dir, width=0, low=0, asc=False, _type=None):
+        super(ModulePort, self).__init__(name, width, low, asc, _type)
         self.dir = dir
 
-    def write(self, range_width=0):
-        return '{dir} wire {range} {name}'.format(dir=self.dir.ljust(6), range=self.range().rjust(range_width), name=self.name)
+    def write(self, type_width=0, range_width=0):
+        s = '{dir} {_type} {range} {name}'
+        return s.format(dir=self.dir.ljust(6),
+                        _type=(self._type or "wire").ljust(type_width),
+                        range=self.range().rjust(range_width),
+                        name=self.name)
 
 class Instance:
     def __init__(self, module, name, parameters, ports):
@@ -60,7 +67,7 @@ class Instance:
             if p.value:
                 return p.value
             elif p.direction == 'input':
-                return str(p.width) + "'d0"
+                return str(p.width or 1) + "'d0"
             else:
                 return ""
         if self.ports:
@@ -96,9 +103,10 @@ class VerilogWriter:
         if self.ports:
             s += "`default_nettype none\n"
             s += "module {name}\n".format(name=self.name)
+            type_len = max([len(p._type or "wire") for p in self.ports])
             max_len = max([len(p.range()) for p in self.ports])
             s += '   ('
-            s += ',\n    '.join([p.write(max_len) for p in self.ports])
+            s += ',\n    '.join([p.write(type_len, max_len) for p in self.ports])
             s += ')'
             s += ';\n\n'
         if self.wires:
