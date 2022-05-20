@@ -14,7 +14,7 @@ setup(
     keywords = "ipxact IP-Xact HDL ASIC FPGA",
     url = "https://github.com/olofk/ipyxact",
     packages = ['ipyxact'],
-    long_description = read('README'),
+    long_description = read('README.md'),
     classifiers = [
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
