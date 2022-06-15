@@ -19,7 +19,7 @@ class IPXactLibrary(object):
     library = {}
     def __init__(self):
         self.module_ports = {}
-        self.includes = []
+        self.imports = []
 
     def set_top_component(self, vlnv):
         self.top_component = self.library[tuple(vlnv.split(':'))]
@@ -94,12 +94,10 @@ class IPXactLibrary(object):
             if _dir:
                 if port.wire.wireTypeDefs:
                     #NOTE: No idea how multiple typedefs are supposed to work. Just pick the first one
-                    wire_type = port.wire.wireTypeDefs.wireTypeDef[0].typeName.valueOf_
-                    type_defs = port.wire.wireTypeDefs.wireTypeDef[0].typeDefinition
-                    for td in type_defs:
-                        if not td.valueOf_ in self.includes:
-                            self.includes.append(td.valueOf_)
-
+                    wire_type = port.wire.wireTypeDefs.wireTypeDef[0].typeDefinition[0].valueOf_ + "::"
+                    wire_type += port.wire.wireTypeDefs.wireTypeDef[0].typeName.valueOf_
+                    if not wire_type in self.imports:
+                        self.imports.append(wire_type)
                 else:
                     wire_type = None
                     width = left+1-right
@@ -363,8 +361,8 @@ class IPXactLibrary(object):
                 vw.add(wire)
         for instance in self.instances.values():
             vw.add(instance)
-        for include in self.includes:
-            vw.header += f'`include "{include}.vh"\n'
+        for _import in self.imports:
+            vw.header += f'import {_import};\n'
         vw.write(output_file)
 
 def parse_args():
