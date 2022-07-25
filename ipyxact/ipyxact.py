@@ -42,7 +42,7 @@ class IpxactInt(int):
         expr = args[0].strip()
         base = 10
 
-        if len(expr) > 2 and expr[0:2] == '0x':
+        if len(expr) > 2 and expr[0:2].lower() == '0x':
             # handle non-standard SystemVerilog (but commonly-used) syntax
             expr = expr[2:]
             base = 16
