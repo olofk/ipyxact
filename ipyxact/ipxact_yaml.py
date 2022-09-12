@@ -217,6 +217,7 @@ registerFile:
     range: IpxactInt
   CHILDREN:
     - register
+    - registerFile
 timingConstraint:
   ATTRIBS:
     clockEdge: str
