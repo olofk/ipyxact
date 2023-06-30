@@ -80,6 +80,9 @@ def write_memory_maps(of, memory_maps, offset=0, name=None):
             mname = m.name.upper()
         multiblock = len(m.addressBlock) > 1
 
+        aub = m.addressUnitBits or 8
+        addr_scale = aub // 8
+
         for block in m.addressBlock:
             if multiblock:
                 bname = mname + '_' + block.name.upper()
@@ -89,7 +92,7 @@ def write_memory_maps(of, memory_maps, offset=0, name=None):
                 reg_name = '{}_{}'.format(
                         bname, reg.name.upper().replace('-', '_'))
                 reg_addr = '0x{:08X}'.format(
-                        offset + block.baseAddress + reg.addressOffset)
+                        offset + (block.baseAddress + reg.addressOffset) * addr_scale)
                 if reg.size in [8, 16, 32, 64]:
                     reg_access = 'RO_' if reg.access == 'read-only' else ''
                     of.write('#define {} IPYXACT_{}REG_{}({})\n'.format(
