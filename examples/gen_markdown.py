@@ -17,6 +17,8 @@ Register Map
     else:
         s = s.format("Register map")
     for m in memory_maps.memoryMap:
+        aub = m.addressUnitBits or 8
+        addr_scale = aub // 8
         if m.name:
             s += "# {}\n".format(m.name)
         if m.description:
@@ -28,7 +30,7 @@ Register Map
                 s += "{}\n".format(block.description)
             for reg in sorted(block.register, key=lambda addr: addr.addressOffset):
                 s += '\n---\n'
-                s += "\n### 0x{:x} {}\n\n".format(offset+block.baseAddress+reg.addressOffset, reg.name)
+                s += "\n### 0x{:x} {}\n\n".format(offset+(block.baseAddress+reg.addressOffset)*addr_scale, reg.name)
                 if reg.description:
                     s += "{}\n\n".format(reg.description)
 
@@ -62,4 +64,3 @@ if __name__ == "__main__":
     offset = 0
     print(write_markdown(f, offset, title))
     f.close()
-
