@@ -25,7 +25,7 @@ setup(
         "Programming Language :: Python",
         "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
     ],
-    entry_points={"console_scripts": ["ipxact2v = ipyxact.ipxact2v:main"]},
+    entry_points={"console_scripts": ["ipxact2v = ipyxact.ipxact2v:main", "ipxact2gv = ipyxact.ipxact2gv:main"]},
     install_requires=[
         'pyyaml',
     ],
