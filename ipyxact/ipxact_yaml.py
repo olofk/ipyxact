@@ -55,6 +55,29 @@ busType:
     library: str
     name:    str
     version: str
+design:
+  MEMBERS:
+    description: str
+    vendor:  str
+    library: str
+    name:    str
+    version: str
+  CHILD:
+    - componentInstances
+    - interconnections
+    - hierConnections 
+hierConnections:
+  CHILDREN:
+    - hierConnection
+interface:
+  ATTRIBS:
+    componentRef: str
+    busRef: str
+hierConnection:
+  ATTRIBS:
+    interfaceRef: str
+  CHILD:
+    - interface
 component:
   MEMBERS:
     description: str
@@ -68,10 +91,36 @@ component:
     - memoryMaps
     - model
     - parameters
+componentRef:
+  ATTRIBS:
+    vendor:  str
+    library: str
+    name:    str
+    version: str
+componentInstances:
+  CHILDREN:
+    - componentInstance
+componentInstance:
+  MEMBERS:
+    instanceName: str
+  CHILD:
+    - componentRef
 componentInstantiation:
   MEMBERS:
     name: str
     moduleName: str
+interconnections:
+  CHILDREN:
+    - interconnection
+activeInterface:
+  ATTRIBS:
+    componentRef: str
+    busRef: str
+interconnection:
+  MEMBERS:
+    name: str
+  CHILDREN:
+    - activeInterface
 constraintSet:
   ATTRIBS:
     constraintSetId: str
