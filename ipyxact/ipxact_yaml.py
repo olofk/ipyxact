@@ -196,6 +196,7 @@ portMaps:
 register:
   MEMBERS:
     name: str
+    displayName: str
     description: str
     dim: IpxactInt
     access: str
