@@ -73,6 +73,12 @@ class IpxactInt(int):
             expr_num *= 1024
         return str(expr_num)
 
+class IpxactOptionalInt(IpxactInt):
+    def __new__(cls, *args, **kwargs):
+        if not args:
+            return None
+        return super(IpxactOptionalInt, cls).__new__(cls, *args, **kwargs)
+
 class IpxactBool(str):
     def __new__(cls, *args, **kwargs):
         if not args:

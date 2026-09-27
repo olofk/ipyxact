@@ -1,5 +1,8 @@
 import unittest
-from ipyxact.ipyxact import IpxactInt
+import io
+import tempfile
+import xml.etree.ElementTree as ET
+from ipyxact.ipyxact import Component, IpxactInt
 
 class IpxactIntTests(unittest.TestCase):
     """
@@ -152,6 +155,57 @@ class IpxactIntTests(unittest.TestCase):
         self.assertRaises(Exception, IpxactInt, "6'soz7")
         self.assertRaises(Exception, IpxactInt, "6'soZ7")
         self.assertRaises(Exception, IpxactInt, "6'so?7")
+
+class ResetMaskTests(unittest.TestCase):
+    def check_reset_masks(self, version):
+        namespace = Component.nsmap[version][1]
+        for mask, expected in [('0x0', 0), ("8'hA5", 0xA5), (None, None)]:
+            reset_xml = '<reset><value>0xff</value>{}</reset>'.format(
+                '' if mask is None else '<mask>{}</mask>'.format(mask))
+            if version == '2014':
+                reset_xml = ('<field><name>f</name><bitOffset>0</bitOffset>'
+                             '<bitWidth>8</bitWidth><resets>{}</resets>'
+                             '</field>').format(reset_xml)
+            xml = ('<component xmlns="{namespace}">'
+                   '<vendor>v</vendor><library>l</library><name>c</name>'
+                   '<version>1</version><memoryMaps><memoryMap><name>m</name>'
+                   '<addressBlock><name>a</name><baseAddress>0</baseAddress>'
+                   '<range>1</range><width>8</width><register><name>r</name>'
+                   '<addressOffset>0</addressOffset><size>8</size>'
+                   '{reset}</register></addressBlock>'
+                   '<addressUnitBits>8</addressUnitBits></memoryMap>'
+                   '</memoryMaps></component>').format(
+                       namespace=namespace, reset=reset_xml)
+            component = Component()
+            component.load(io.BytesIO(xml.encode('utf-8')))
+            self.check_parsed_reset(component, version, expected)
+
+            with tempfile.TemporaryFile(mode='w+') as output:
+                component.write(output)
+                output.seek(0)
+                root = ET.parse(output).getroot()
+                masks = root.findall('.//{{{}}}mask'.format(namespace))
+                self.assertEqual(len(masks), 0 if mask is None else 1)
+                if masks:
+                    self.assertEqual(int(masks[0].text), expected)
+                output.seek(0)
+                reloaded = Component()
+                reloaded.load(output)
+                self.check_parsed_reset(reloaded, version, expected)
+
+    def check_parsed_reset(self, component, version, expected):
+        register = component.memoryMaps.memoryMap[0].addressBlock[0].register[0]
+        reset = (register.field[0].resets.reset if version == '2014'
+                 else register.reset)
+        self.assertEqual(reset.value, 0xff)
+        self.assertEqual(reset.mask, expected)
+        self.assertEqual(register.dim, 0)
+
+    def test_register_reset_2009(self):
+        self.check_reset_masks('2009')
+
+    def test_field_reset_2014(self):
+        self.check_reset_masks('2014')
 
 def main():
     unittest.main(verbosity=2, )
